@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="dark only">
+<meta name="description" content="被験者Kの冷蔵庫を、1週間定点観測した記録。">
+<title>観測記録K｜被験者Kの冷蔵庫 ― 定点観測記録</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background: #0a0a0a; color: #e8e8e8; line-height: 1.8;
+    -webkit-text-size-adjust: 100%;
+  }
+  section {
+    min-height: 100svh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 36px 20px; gap: 18px;
+    border-bottom: 1px solid #1c1c1c;
+  }
+  h1 { font-size: 28px; font-weight: 700; letter-spacing: .08em; }
+  h2 { font-size: 21px; font-weight: 700; }
+  p { font-size: 16px; max-width: 32em; }
+  .small { font-size: 13px; color: #999; max-width: 32em; }
+  .ts { font-family: ui-monospace, "SF Mono", Menlo, monospace; color: #8a8a8a; font-size: 14px; letter-spacing: .05em; }
+  .rec { color: #ff3b30; font-weight: 700; animation: blink 1.6s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: .15; } }
+  .grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    font-size: 29px; line-height: 1.4; width: min(92vw, 430px);
+  }
+  .grid div {
+    border: 1px solid #2c2c2c; background: #111; border-radius: 6px; padding: 12px 4px;
+    min-height: 64px; display:flex; align-items:center; justify-content:center;
+  }
+  .grid .odd { border-color: #6e2b26; background: #1a0f0e; }
+  .log {
+    border: 1px solid #2c2c2c; background: #101010; border-radius: 8px;
+    padding: 16px 18px; text-align: left; width: min(92vw, 460px);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .log .q { color: #cfcfcf; }
+  .log .a { color: #fff; }
+  .choices { display: flex; flex-direction: column; gap: 12px; width: min(92vw, 420px); }
+  button, a.btn {
+    font: inherit; font-size: 16px; padding: 14px 18px; border-radius: 6px;
+    border: 1px solid #e8e8e8; background: transparent; color: #e8e8e8; cursor: pointer;
+    text-decoration: none; display: block; width: 100%;
+  }
+  button.primary { background: #e8e8e8; color: #0a0a0a; font-weight: 700; }
+  button:disabled { opacity: .4; cursor: default; }
+  button.picked { background: #e8e8e8; color: #0a0a0a; opacity: 1; }
+  button.plain { border-color: #444; color: #aaa; }
+  .palette { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 420px; }
+  .palette button { width: 68px; height: 68px; font-size: 34px; padding: 0; border-radius: 10px; border-color: #444; }
+  .palette button.picked { background: #e8e8e8; }
+  .reaction { font-size: 16px; min-height: 1.7em; max-width: 32em; color: #cfcfcf; }
+  .redact { background: #e8e8e8; color: #e8e8e8; border-radius: 2px; padding: 0 .4em; user-select: none; }
+  .receipt {
+    border: 1px dashed #555; border-radius: 6px; padding: 16px 26px;
+    font-size: 21px; line-height: 2; letter-spacing: 2px; background:#0d0d0d;
+  }
+  .hidden { display: none !important; }
+  .big { font-size: 34px; }
+  .paper {
+    background: #f7f5ef; color: #1a1a1a; width: min(92vw, 440px);
+    padding: 30px 26px; border-radius: 2px; text-align: center;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    box-shadow: 0 8px 40px rgba(0,0,0,.6); line-height: 1.9;
+  }
+  .paper .ptitle { font-size: 21px; font-weight: 700; letter-spacing: .12em; }
+  .paper .psub { font-size: 13px; color: #555; }
+  .paper hr { border: none; border-top: 1px solid #999; margin: 12px 0; }
+  .paper .score { font-size: 19px; letter-spacing: .2em; }
+  .paper table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .paper td { padding: 4px 2px; text-align: left; }
+  .paper td.dots { text-align: right; letter-spacing: .25em; }
+  .paper .sign { font-size: 18px; margin-top: 8px; }
+  .doc {
+    width: min(92vw, 480px); border: 1px solid #444; background: #0d0d0d;
+    padding: 14px 18px; text-align: left; line-height: 1.9;
+  }
+  .doc .dlabel { font-family: ui-monospace, Menlo, monospace; color: #9d9; font-size: 13px; letter-spacing: .12em; }
+  .doc.receipt-doc { background: #f7f5ef; color: #222; font-family: ui-monospace, Menlo, monospace; border: none; }
+  .doc.receipt-doc .dlabel { color: #666; }
+  .fridgebox { display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(92vw, 480px); }
+  .corridor { min-height: 460svh; justify-content: flex-start; padding-top: 16svh; gap: 110svh; }
+  .glimpse { opacity: .38; filter: blur(1.2px); }
+  .stamp {
+    display: inline-block; border: 2px solid currentColor; border-radius: 4px;
+    padding: 4px 12px; transform: rotate(-2deg);
+    font-family: ui-monospace, Menlo, monospace; font-size: 14px;
+    margin: 16px auto 34px;
+  }
+  .stamp-red { color: #e06666; }
+  .stamp-gray { color: #888; }
+  .paper .cover-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; padding: 6px 0; border-bottom: 1px dotted #aaa; text-align: left;
+  }
+  .paper .cover-row .mini-stamp {
+    border: 2px solid currentColor; border-radius: 4px; padding: 1px 8px;
+    font-size: 12px; transform: rotate(-3deg); white-space: nowrap;
+    font-family: ui-monospace, Menlo, monospace;
+  }
+  .paper .big-stamp {
+    display: inline-block; margin-top: 16px; border: 3px solid currentColor; border-radius: 6px;
+    padding: 6px 22px; font-size: 24px; font-weight: 700; letter-spacing: .3em;
+    transform: rotate(-6deg); font-family: ui-monospace, Menlo, monospace;
+  }
+</style>
+</head>
+<body>
+
+<!-- 0. 研究所トップ -->
+<section id="s0">
+  <p class="ts"><span class="rec">● REC</span>　ARCHIVE No. K-07</p>
+  <h1>観測記録K</h1>
+  <p>被験者Kの冷蔵庫 ― 定点観測記録</p>
+  <p style="font-size:19px; letter-spacing:.14em;">誰もいないのに、増えている。</p>
+  <div class="log">
+    <p>観測機関：生活記録観測所</p>
+    <p>目的：一人暮らしの食料保管の実態を、記録すること。</p>
+    <p>方法：冷蔵庫内を定点観測し、購入記録・廃棄記録・本人の証言と照合する。</p>
+    <p>被験者K：大学2年、一人暮らし。本人の同意のもと、氏名は伏せて公開する。</p>
+    <p>本所の記録に、誤りはありません。</p>
+  </div>
+  <p class="small">※この記録は、あなたの端末内にだけ保存されます。外部に送信されることはありません。<br>※下のボタンで、観測室の環境音を出せます。</p>
+  <div id="revisit" class="hidden">
+    <p id="revisitText"></p>
+  </div>
+  <div class="choices">
+    <button class="plain" id="soundBtn" onclick="toggleSound()">🔇 音：オフ</button>
+    <button class="primary" onclick="go('s-practice')">まず、練習記録を開く</button>
+  </div>
+  <p class="small">体験デザイン応用版 ― 『「ついやってしまう」体験のつくりかた』応用プロトタイプ</p>
+</section>
+
+
+<!-- 練習記録（記録0） -->
+<section id="s-practice">
+  <p class="ts">記録0 ― 練習</p>
+  <h2>観測者の仕事は、1つだけです。</h2>
+  <p>「記録」と「実物」のズレを見つけること。<br>まず、練習でやってみます。</p>
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr); width: min(92vw, 300px);">
+    <div>🥛</div><div>🍎</div>
+    <div>🧀</div><div>（空）</div>
+  </div>
+  <p class="small">練習用冷蔵庫。購入記録：この日、買ったのは🥛だけです。</p>
+  <div class="choices">
+    <button class="primary" onclick="showPractice2()">2日目を見る</button>
+  </div>
+</section>
+
+<section id="s-practice2">
+  <p class="ts">記録0 ― 2日目</p>
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr); width: min(92vw, 300px);">
+    <div>🥛</div><div>🍎</div>
+    <div>🧀</div><div>🍇</div>
+  </div>
+  <p>購入記録：2日目も、買ったのは🥛だけです。</p>
+  <p><strong>問い：記録と実物に、ズレはありますか？</strong></p>
+  <div class="choices">
+    <button onclick="answerPractice(true,this)">ある。🍇は、買っていない</button>
+    <button onclick="answerPractice(false,this)">ない</button>
+  </div>
+  <p class="reaction" id="practiceMsg"></p>
+  <div class="choices">
+    <button class="primary hidden" id="toPrecheck" onclick="go('s1')">分かった。本番の記録へ</button>
+  </div>
+</section>
+
+<!-- 1. 照合用の入力（寄せ） -->
+<section id="s1">
+  <p class="ts">PRE-CHECK</p>
+  <h2>記録の照合のため、1つ教えてください。</h2>
+  <p>あなたの冷蔵庫で、いちばん長く残っているものは、どれですか？</p>
+  <div class="palette" id="palette">
+    <button data-food="🍌" aria-label="バナナ">🍌</button>
+    <button data-food="🥦" aria-label="ブロッコリー">🥦</button>
+    <button data-food="🥛" aria-label="牛乳">🥛</button>
+    <button data-food="🍞" aria-label="パン">🍞</button>
+    <button data-food="🧀" aria-label="チーズ">🧀</button>
+    <button data-food="🍅" aria-label="トマト">🍅</button>
+  </div>
+  <p id="pickedMsg" class="small"></p>
+  <p class="small">選ばなくても、進めます。</p>
+  <div class="choices">
+    <button class="primary" onclick="confirmFood()">本番の記録へ進む</button>
+  </div>
+</section>
+
+<!-- Day1 -->
+<section id="day1">
+  <p class="ts">DAY 1 ― 初期観測</p>
+  <div class="doc">
+    <p class="dlabel">【資料】本人の申告</p>
+    <p>観測者：卵について、教えてください。<br>K：「卵は、常にあります」</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day1" onclick="openFridge('day1')">冷蔵庫を開ける</button>
+    <div id="g-day1" class="hidden"><div class="grid">
+    <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>🥩</div><div>🍐🍐</div>
+  </div></div>
+    <p class="small hidden" id="closed-day1">冷蔵庫は、閉じられました</p>
+    <button class="hidden" id="close-day1" onclick="closeFridge('day1','post-day1')">冷蔵庫を閉じる</button>
+  </div>
+  <div id="post-day1" class="hidden">
+    <div class="doc">
+      <p class="dlabel">【資料2】観測メモ</p>
+      <p>卵は3個。申告と、一致。</p>
+      <p class="stamp" style="color:#7fb069">照合 ― 一致</p>
+    </div>
+    <div class="choices">
+      <button class="primary" onclick="transit('day2','g-day1')">次の日へ</button>
+    </div>
+  </div>
+</section>
+
+
+<section id="corr1" class="corridor">
+  <p class="ts glimpse">記録を、送付しています</p>
+  <div class="grid glimpse">
+    <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>🥩</div><div>🍐🍐</div>
+  </div>
+  <p class="small glimpse">照合：完了</p>
+</section>
+
+<!-- Day2 -->
+<section id="day2">
+  <p class="ts">DAY 2 ― 19:42　買い物／21:05　観測</p>
+  <div class="doc receipt-doc">
+    <p class="dlabel">【資料1】購入記録</p>
+    <p>🍞 ×1<br>🧻 ×1<br>🍙 ×1<br>※いずれも、冷蔵庫の外で保管されるもの</p>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】本人の申告</p>
+    <p>K：「🥩を食べた。🥛を1本飲んだ」</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day2" onclick="openFridge('day2')">冷蔵庫を開ける</button>
+    <div id="g-day2" class="hidden"><div class="grid">
+    <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍐</div>
+  </div></div>
+    <p class="small hidden" id="closed-day2">冷蔵庫は、閉じられました</p>
+    <button class="hidden" id="close-day2" onclick="closeFridge('day2','post-day2')">冷蔵庫を閉じる</button>
+  </div>
+  <div id="post-day2" class="hidden">
+    <div class="doc">
+      <p class="dlabel">【資料3】観測メモ</p>
+      <p>🥩と🥛1本の減少は、申告と一致。異常なし。</p>
+      <p class="stamp" style="color:#7fb069">照合 ― 一致</p>
+    </div>
+    <div class="choices">
+      <button class="primary" onclick="transit('day3','g-day2')">次の日へ</button>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="corr2" class="corridor">
+  <p class="small glimpse">……</p>
+  <div class="grid glimpse">
+    <div>🍓</div><div>🥛🥛🥛</div><div>🍮</div>
+    <div>🥝</div><div>🍑</div><div>🥚</div>
+    <div>🧈</div><div id="corrFoodCell">🍇🍇</div><div>🥒</div>
+  </div>
+  <p class="small glimpse">……</p>
+</section>
+
+
+<!-- Day3：齟齬1 -->
+<section id="day3">
+  <p class="ts">DAY 3 ― 07:58　観測</p>
+  <div class="doc receipt-doc">
+    <p class="dlabel">【資料1】購入記録</p>
+    <p>🥫 ×1<br>🥛 ×1<br>※🥫は、棚で保管</p>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】本人の申告</p>
+    <p>本日、申告はありません。</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day3" onclick="openFridge('day3')">冷蔵庫を開ける</button>
+    <div id="g-day3" class="hidden"><div class="grid">
+    <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍇</div>
+  </div></div>
+    <p class="small hidden" id="closed-day3">冷蔵庫は、閉じられました</p>
+    <button class="hidden" id="close-day3" onclick="closeFridge('day3','post-day3')">冷蔵庫を閉じる</button>
+  </div>
+  <div id="post-day3" class="hidden">
+    <div class="doc">
+      <p class="dlabel">【資料3】観測メモ</p>
+    <p>観測メモ：資料と比べて、🍐が1つ減り、🍇が1つ増えています。</p>
+    <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
+    <div class="choices">
+      <button onclick="answerCheck(1,false,this)">異常なしとして処理する</button>
+      <button onclick="answerCheck(1,true,this)">異常として報告する</button>
+    </div>
+    <p class="reaction" id="check1Msg"></p>
+    <p class="stamp hidden" id="stamp1"></p>
+    </div>
+    <div class="choices">
+      <button class="primary hidden" id="toDay4" onclick="transit('day4','g-day3')">次の日へ</button>
+    </div>
+  </div>
+</section>
+
+
+<section id="corr3" class="corridor">
+  <p class="ts glimpse">記録を、送付しています</p>
+  <div class="doc receipt-doc glimpse">
+    <p>🥚 ×1<br>🧀 ×1<br>宝くじ ×1<br>（以下、かすれて読めない）</p>
+  </div>
+  <p class="small glimpse">照合：完了</p>
+</section>
+
+<!-- Day4 -->
+<section id="day4">
+  <p class="ts">DAY 4 ― 20:17　観測</p>
+  <div class="doc receipt-doc">
+    <p class="dlabel">【資料1】購入記録</p>
+    <p id="day4receipt">×2</p>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】本人の申告</p>
+    <p>観測者：卵について。<br>K：「卵は買ってないです。……買った、かな？」<br>同日 22:03 ― 廃棄の申告：🥦を廃棄した。</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day4" onclick="openFridge('day4')">冷蔵庫を開ける</button>
+    <div id="g-day4" class="hidden"><div class="grid">
+    <div>🥛🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍇</div>
+  </div></div>
+    <p class="small hidden" id="closed-day4">冷蔵庫は、閉じられました</p>
+    <button class="hidden" id="close-day4" onclick="closeFridge('day4','post-day4')">冷蔵庫を閉じる</button>
+  </div>
+  <div id="post-day4" class="hidden">
+    <div class="doc">
+      <p class="dlabel">【資料3】観測メモ</p>
+    <p>観測メモ：卵が、3個から6個に増えています。</p>
+    <p><strong>観測者への確認：卵の増加を、どう所見しますか？</strong></p>
+    <div class="choices">
+      <button onclick="answerCheck(2,false,this)">異常なしとして処理する</button>
+      <button onclick="answerCheck(2,true,this)">異常として報告する</button>
+    </div>
+    <p class="reaction" id="check2Msg"></p>
+    <p class="stamp hidden" id="stamp2"></p>
+    </div>
+    <div class="choices">
+      <button class="primary hidden" id="toDay5" onclick="transit('day5','g-day4')">次の日へ</button>
+    </div>
+  </div>
+</section>
+
+
+<section id="corr4" class="corridor">
+  <p class="ts glimpse">廃棄記録を、照合しています</p>
+  <p class="big glimpse">🥦</p>
+  <p class="small glimpse">照合：完了</p>
+</section>
+
+<!-- Day5：齟齬2 -->
+<section id="day5">
+  <p class="ts">DAY 5 ― 08:11　観測</p>
+  <div class="doc receipt-doc">
+    <p class="dlabel">【資料1】購入記録</p>
+    <p>本日、購入記録はありません。</p>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】本人の申告</p>
+    <p>本日、申告はありません。<br>※昨日の申告：🥦を廃棄した ― Day 4、22:03。</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day5" onclick="openFridge('day5')">冷蔵庫を開ける</button>
+    <div id="g-day5" class="hidden"><div class="grid">
+    <div>🥛🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍇</div>
+  </div></div>
+    <p class="small hidden" id="closed-day5">冷蔵庫は、閉じられました</p>
+    <button class="hidden" id="close-day5" onclick="closeFridge('day5','post-day5')">冷蔵庫を閉じる</button>
+  </div>
+  <div id="post-day5" class="hidden">
+    <div class="doc">
+      <p class="dlabel">【資料3】観測メモ</p>
+    <p>観測メモ：廃棄の申告があった🥦が、同じ位置にあります。</p>
+    <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
+    <div class="choices">
+      <button onclick="answerCheck(3,false,this)">異常なしとして処理する</button>
+      <button onclick="answerCheck(3,true,this)">異常として報告する</button>
+    </div>
+    <p class="reaction" id="check3Msg"></p>
+    <p class="stamp hidden" id="stamp3"></p>
+    </div>
+    <div class="choices">
+      <button class="primary hidden" id="toDay6" onclick="transit('day6','g-day5')">次の日へ</button>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="corr5" class="corridor">
+  <p class="small glimpse">……</p>
+  <div class="grid glimpse">
+    <div>🍎</div><div>🍞</div><div>🥛</div>
+    <div>🥚🥚</div><div>🍙</div><div>🍋</div>
+    <div>🧈</div><div>🍇</div><div>🥒</div>
+  </div>
+  <p class="ts glimpse">25:13</p>
+</section>
+
+
+<!-- Day6：齟齬3 -->
+<section id="day6">
+  <p class="ts">DAY 6 ― 25:13　観測</p>
+  <div class="doc">
+    <p class="dlabel">【資料】本人の証言</p>
+    <p>観測者：初日に、卵は3個でした。<br>K：「卵？ 最初から、6個ですよ」</p>
+    <p>再掲 ― Day 1の記録：🥚は3個。K「卵は、常にあります」</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day6" onclick="openFridge('day6')">冷蔵庫を開ける</button>
+    <div id="g-day6" class="hidden"><div class="grid">
+    <div>🥛🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍇</div>
+  </div></div>
+    <p class="small hidden" id="closed-day6">冷蔵庫は、閉じられました</p>
+    <button class="hidden" id="close-day6" onclick="closeFridge('day6','post-day6')">冷蔵庫を閉じる</button>
+  </div>
+  <div id="post-day6" class="hidden">
+    <div class="doc">
+      <p class="dlabel">【資料2】観測メモ</p>
+      <p id="day6food"></p>
+      <p>記録と、証言が、食い違っています。……この件の所見は、求められていません。</p>
+    </div>
+    <div class="choices">
+      <button class="primary" onclick="transit('day7',null)">最終日へ</button>
+    </div>
+  </div>
+</section>
+
+
+<section id="corr6" class="corridor">
+  <p class="small glimpse">最終記録を、開きます</p>
+</section>
+
+<!-- Day7 -->
+<section id="day7">
+  <p class="ts">DAY 7 ― 10:00　最終観測</p>
+  <div class="fridgebox">
+    <button class="primary" id="open-day7" onclick="openFridge('day7')">冷蔵庫を開ける</button>
+    <div id="g-day7" class="hidden"><div class="grid">
+    <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕</div><div>（空）</div><div>🍅</div>
+    <div>🍌</div><div>（空）</div><div>🍐</div>
+  </div></div>
+    <p class="small hidden" id="closed-day7">冷蔵庫は、閉じられました</p>
+    <button class="hidden" id="close-day7" onclick="closeFridge('day7','post-day7')">冷蔵庫を閉じる</button>
+  </div>
+  <div id="post-day7" class="hidden">
+  <div class="doc">
+    <p class="dlabel">【資料】廃棄記録</p>
+    <div id="wasteLog">
+      <p>🥚 ×3 ― 期限切れ</p>
+      <p id="wasteFood">余らせた食材 ×1</p>
+      <p>🥦 ×1 ― 最終日に廃棄</p>
+      <p>🍇 ×1 ― 期限切れ</p>
+      <p>合計：約400円</p>
+      <p>特売で浮いた分：約80円／捨てた分：約400円 ― 差し引き、損をしています</p>
+    </div>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】当事者の記録</p>
+    <p>🥚「まだ3つ残っていたのに、特売で、もう1パック買われました。古い方から、期限が切れました」</p>
+    <p>🥦「少し状態が悪くなったので、捨てられたと思っていました。――捨てられていませんでした」</p>
+    <p id="wasteFoodVoice"></p>
+  </div>
+  <p>冷蔵庫は、片付いていました。Day 1 と、同じ冷蔵庫です。中身だけが、減りました。</p>
+    <div class="choices">
+      <button class="primary" onclick="showEnding()">観測を、終える</button>
+    </div>
+  </div>
+</section>
+
+<!-- 結末 -->
+<section id="s-ending">
+  <p class="ts" id="endingCode">CASE K-07</p>
+  <h2 id="endingTitle"></h2>
+  <div class="log" id="endingLog"></div>
+  <p id="endingLine"></p>
+  <div class="choices">
+    <button class="primary" onclick="go('s-result')">あなたの観測結果を見る</button>
+  </div>
+</section>
+
+<!-- リザルト -->
+<section id="s-result">
+  <p>観測が完了しました。<br>ご協力ありがとうございました。</p>
+  <p class="small">結果画像は保存してシェアいただけます。</p>
+  <div class="paper" id="resultPaper">
+    <p class="psub">生活記録観測所</p>
+    <p class="ptitle">観測記録ファイル ― 表紙</p>
+    <p class="psub">ARCHIVE No. K-07 ／ 被験者Kの冷蔵庫 ／ 観測期間：7日間</p>
+    <hr>
+    <div class="cover-row"><span>練習記録 ― 記録0</span><span class="mini-stamp" id="rPractice">―</span></div>
+    <div class="cover-row"><span>DAY 3 ― 🍇の出現</span><span class="mini-stamp" id="rD1">―</span></div>
+    <div class="cover-row"><span>DAY 4 ― 🥚の増加</span><span class="mini-stamp" id="rD2">―</span></div>
+    <div class="cover-row"><span>DAY 5 ― 🥦の回帰</span><span class="mini-stamp" id="rD3">―</span></div>
+    <div class="cover-row"><span>DAY 6 ― 証言の矛盾</span><span class="mini-stamp stamp-gray">所見対象外</span></div>
+    <p><span class="big-stamp" id="rBigStamp">―</span></p>
+    <p class="psub hidden" id="rWill"></p>
+    <p class="psub" id="rDate"></p>
+    <p class="psub">超常現象は、ない。あるのは、冷蔵庫と、嘘をつく記憶だけ</p>
+  </div>
+  <p id="resultTotal"></p>
+  <div id="willBlock">
+    <p><strong>最後に1つ。あなたの冷蔵庫で、明日からやることを選んでください。</strong></p>
+    <div class="choices">
+      <button onclick="chooseWill('写真を撮る',this)">写真を撮る</button>
+      <button onclick="chooseWill('買い物リストを書く',this)">買い物リストを書く</button>
+      <button onclick="chooseWill('何もしない',this)">何もしない</button>
+    </div>
+    <p class="reaction" id="willMsg"></p>
+  </div>
+  <div class="choices">
+    <button class="primary" onclick="saveResultImage()">結果画像を保存する</button>
+    <button onclick="go('s-final')">最後の記録へ</button>
+  </div>
+  <canvas id="resultCanvas" width="880" height="1040" class="hidden"></canvas>
+</section>
+
+<!-- 最後の記録 -->
+<section id="s-final">
+  <p class="ts" id="finalDate"></p>
+  <p id="finalLine">見ていないものは、無いのと同じだ。<br>行動は、1つだけです。</p>
+  <p id="finalWill"></p>
+  <p class="big"><strong>買い物に行く前に、<br>冷蔵庫の写真を1枚撮る。</strong></p>
+  <div class="choices">
+    <button class="primary" onclick="shareRecord()">この記録をシェアする</button>
+    <a class="btn" href="https://kazunori-miyamoto.github.io/testpages/reizouko/">次は、あなたの買い物が観測されます ＞</a>
+    <a class="btn" href="https://www.kodomokoho.metro.tokyo.lg.jp/article/202404-3/" target="_blank" rel="noopener">フードロスについて、くわしく見る ＞</a>
+    <button class="plain" onclick="location.reload()">記録を読み直す</button>
+    <button class="plain" onclick="resetHistory()">観測履歴をリセット</button>
+  </div>
+</section>
+
+<script>
+const KEY = 'kansoku2_v1';
+const state = { food: '🍌', foodPicked: false, noticed: {}, score: 0, practiceOk: false, will: null };
+const CHECK_NAMES = { 1: '🍇の出現', 2: '🥚の増加', 3: '捨てたはずの🥦' };
+
+function load(key) { try { return JSON.parse(localStorage.getItem(key)) || null; } catch (e) { return null; } }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+function go(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+/* 再訪（隠し結末Dの入口） */
+(function init() {
+  const h = load(KEY);
+  if (h && h.plays > 0) {
+    document.getElementById('revisitText').innerHTML = (h.missed && h.missed.length)
+      ? '前回の観測の、続きです。<br>前回、あなたが見落としたのは：' + h.missed.join('、') + ' でした。<br>再観測として、同じ記録をもう一度開きます。'
+      : '前回の観測の、続きです。<br>前回、あなたは全部の齟齬に気づけました。……本当に、そうでしたか？';
+    document.getElementById('revisit').classList.remove('hidden');
+  }
+  const d = new Date();
+  document.getElementById('finalDate').textContent =
+    d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' ― 新規観測対象：あなたの冷蔵庫';
+})();
+
+/* 入力（寄せ） */
+document.getElementById('palette').addEventListener('click', function (e) {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#palette button').forEach(x => x.classList.remove('picked'));
+  b.classList.add('picked');
+  state.food = b.dataset.food;
+  document.getElementById('pickedMsg').textContent = '照合しました：' + state.food;
+});
+function confirmFood() {
+  const picked = document.querySelector('#palette button.picked');
+  state.foodPicked = !!picked;
+  if (!picked) state.food = '🍌';
+  document.getElementById('day4receipt').textContent =
+    state.food + ' ×2';
+  document.getElementById('day6food').textContent =
+    state.food + ' は、傷み始めていた。記録には「まだ食べられる」とある。';
+  document.getElementById('wasteFood').textContent = state.food + ' ×1 ― 期限切れ';
+  document.getElementById('wasteFoodVoice').textContent = state.food + '「安かったので、余分に買われました」';
+  const cfc = document.getElementById('corrFoodCell');
+  if (cfc) cfc.textContent = state.food + state.food;
+  go('day1');
+}
+
+/* 進行：回廊を自動スクロールして次へ（過ぎた記録は再表示されない） */
+let transitAnim = null;
+function transit(nextId, eraseId) {
+  if (eraseId) {
+    const el = document.getElementById(eraseId);
+    if (el) el.innerHTML = '<p class="small">この記録は照合済みです。再表示はされません</p>';
+  }
+  const target = document.getElementById(nextId);
+  if (!target) return;
+  const startY = window.scrollY;
+  const endY = target.getBoundingClientRect().top + window.scrollY;
+  const dur = 2400;
+  const t0 = performance.now();
+  if (transitAnim) cancelAnimationFrame(transitAnim);
+  const step = (t) => {
+    const p = Math.min(1, (t - t0) / dur);
+    const e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    window.scrollTo(0, startY + (endY - startY) * e);
+    if (p < 1) transitAnim = requestAnimationFrame(step);
+    else transitAnim = null;
+  };
+  transitAnim = requestAnimationFrame(step);
+}
+['wheel', 'touchstart'].forEach(ev => window.addEventListener(ev, () => {
+  if (transitAnim) { cancelAnimationFrame(transitAnim); transitAnim = null; }
+}, { passive: true }));
+
+/* 冷蔵庫の開閉 */
+function openFridge(n) {
+  if (actx && soundNodes && soundNodes.g.gain.value > 0) {
+    const f = (n === 'day3' || n === 'day4' || n === 'day5') ? 50 : 55;
+    soundNodes.o1.frequency.linearRampToValueAtTime(f, actx.currentTime + 0.3);
+    if (n === 'day6') {
+      soundNodes.g.gain.linearRampToValueAtTime(0.02, actx.currentTime + 0.15);
+      setTimeout(() => {
+        if (soundNodes && soundNodes.g.gain.value < 0.25) {
+          soundNodes.g.gain.linearRampToValueAtTime(0.5, actx.currentTime + 0.5);
+        }
+      }, 1300);
+    }
+  }
+  document.getElementById('open-' + n).classList.add('hidden');
+  document.getElementById('g-' + n).classList.remove('hidden');
+  document.getElementById('close-' + n).classList.remove('hidden');
+}
+function closeFridge(n, postId) {
+  document.getElementById('g-' + n).classList.add('hidden');
+  document.getElementById('close-' + n).classList.add('hidden');
+  document.getElementById('closed-' + n).classList.remove('hidden');
+  const post = document.getElementById(postId);
+  if (post) {
+    post.classList.remove('hidden');
+    post.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+/* 練習 */
+function showPractice2() { go('s-practice2'); }
+function answerPractice(ok, btn) {
+  state.practiceOk = ok;
+  btn.closest('.choices').querySelectorAll('button').forEach(b => { b.disabled = true; });
+  btn.classList.add('picked'); btn.disabled = false;
+  document.getElementById('practiceMsg').innerHTML = ok
+    ? '正解です。買っていない🍇が、ある。これが「齟齬」です。<br>本番では、こういうズレが3回出ます。報告するか、異常なしとするかは、あなたの判断です。'
+    : 'ズレは、ありました。買っていない🍇が、増えています。<br>本番では、こういうズレが3回出ます。報告するか、異常なしとするかは、あなたの判断です。';
+  const next = document.getElementById('toPrecheck');
+  next.classList.remove('hidden');
+  setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
+}
+
+/* 環境音（Web Audioで生成、ファイルなし） */
+let actx = null, soundNodes = null;
+function toggleSound() {
+  const btn = document.getElementById('soundBtn');
+  if (!actx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { btn.textContent = '🔇 音：非対応'; return; }
+    actx = new AC();
+    const g = actx.createGain(); g.gain.value = 0.0; g.connect(actx.destination);
+    const o1 = actx.createOscillator(); o1.type = 'sine'; o1.frequency.value = 55;
+    const og1 = actx.createGain(); og1.gain.value = 1.0; o1.connect(og1); og1.connect(g);
+    const o2 = actx.createOscillator(); o2.type = 'sine'; o2.frequency.value = 110;
+    const og2 = actx.createGain(); og2.gain.value = 0.12; o2.connect(og2); og2.connect(g);
+    const len = actx.sampleRate * 2;
+    const buf = actx.createBuffer(1, len, actx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const noise = actx.createBufferSource(); noise.buffer = buf; noise.loop = true;
+    const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 320;
+    const ng = actx.createGain(); ng.gain.value = 0.2;
+    noise.connect(f); f.connect(ng); ng.connect(g);
+    o1.start(); o2.start(); noise.start();
+    soundNodes = { g, o1 };
+  }
+  if (actx.state === 'running' && soundNodes.g.gain.value > 0) {
+    soundNodes.g.gain.linearRampToValueAtTime(0.0, actx.currentTime + 0.4);
+    btn.textContent = '🔇 音：オフ';
+  } else {
+    actx.resume();
+    soundNodes.g.gain.linearRampToValueAtTime(0.5, actx.currentTime + 0.6);
+    btn.textContent = '🔊 音：オン';
+  }
+}
+
+/* 齟齬チェック */
+function answerCheck(n, noticed, btn) {
+  if (state.noticed[n] !== undefined) return;
+  state.noticed[n] = noticed;
+  if (noticed) state.score++;
+  const sec = btn.closest('section');
+  sec.querySelectorAll('.choices button').forEach(b => { if (!b.id) b.disabled = true; });
+  btn.classList.add('picked'); btn.disabled = false;
+  document.getElementById('check' + n + 'Msg').textContent = noticed
+    ? '報告を受け付けました。'
+    : '異常なしとして、処理しました。';
+  const st = document.getElementById('stamp' + n);
+  if (st) {
+    st.classList.remove('hidden');
+    if (noticed) { st.textContent = '異常として報告済み'; st.classList.add('stamp-red'); }
+    else { st.textContent = '異常なしとして処理'; st.classList.add('stamp-gray'); }
+  }
+  const next = document.getElementById('toDay' + (n + 3));
+  next.classList.remove('hidden');
+  setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
+}
+
+/* 結末 */
+function showEnding() {
+  const title = document.getElementById('endingTitle');
+  const log = document.getElementById('endingLog');
+  const line = document.getElementById('endingLine');
+  const missedNums = [1, 2, 3].filter(n => !state.noticed[n]);
+  let reveal = '';
+  const rz = load('reizouko_v1');
+  if (rz && rz.lastTraps && rz.lastTraps.length) {
+    reveal += '<p>照合：あなたの買い物の記録にも、同じ型がありました ― ' + rz.lastTraps.join('・') + '。</p>';
+  }
+  if (state.score === 3) {
+    title.textContent = '結末A「観測者」';
+    log.innerHTML =
+      '<p>照合表 ― 記録と、申告。</p>' +
+      '<p>🍇｜記録：Day 2のレシートに、購入行あり・特売｜申告：「買っていない」</p>' +
+      '<p>🥚｜記録：Day 4に、購入記録なし｜証言：「最初から、6個」</p>' +
+      '<p>🥦｜記録：廃棄の実行記録、なし｜申告：「捨てた」</p>' +
+      '<p>時刻 25:13｜深夜の開閉記録。本人の申告なし。寝ぼけて開けた、本人の記録でした</p>' +
+      '<p>被験者K ― 登録票：買い物パターンの出典 …… 観測者の回答：' + state.food + '</p>' + reveal;
+    line.textContent = '幽霊は、いませんでした。怪異の正体は、忘れていく自分だった。';
+  } else if (state.score >= 1) {
+    title.textContent = '結末B「半分だけ見ていた」';
+    const TBL = {
+      1: '<p>🍇｜記録：Day 2のレシートに、購入行あり・特売｜申告：「買っていない」</p>',
+      2: '<p>🥚｜記録：Day 4に、購入記録なし｜証言：「最初から、6個」</p>',
+      3: '<p>🥦｜記録：廃棄の実行記録、なし｜申告：「捨てた」</p>'
+    };
+    const rows = [1, 2, 3].map(n => state.noticed[n] ? TBL[n]
+      : '<p>' + CHECK_NAMES[n] + '：照合、未実施</p>').join('');
+    log.innerHTML = '<p>照合表 ― 記録と、申告。</p>' + rows +
+      '<p>時刻 25:13｜深夜の開閉記録。本人の申告なし。寝ぼけて開けた、本人の記録でした</p>' +
+      '<p>被験者K ― 登録票：買い物パターンの出典 …… 一部、伏せられています</p>' + reveal;
+    line.textContent = '見落とした分は、あなたの冷蔵庫でも起きています。';
+  } else {
+    title.textContent = '結末C「原因不明」';
+    log.innerHTML =
+      '<p>本観測は、原因不明のまま終了する。</p>' +
+      '<p>記録は、封印される。</p>' +
+      '<p>封印前に、1枚だけ差し込まれていた。被験者K ― 登録票：買い物パターンの出典 …… 観測者の回答：' + state.food + '</p>';
+    line.textContent = '……ただ、最後の1行が、追加されています。';
+  }
+  const setStamp = (id, on) => {
+    const el = document.getElementById(id);
+    el.textContent = on ? '報告済み' : '未照合';
+    el.style.color = on ? '#b03a3a' : '#888';
+  };
+  setStamp('rPractice', state.practiceOk);
+  setStamp('rD1', !!state.noticed[1]);
+  setStamp('rD2', !!state.noticed[2]);
+  setStamp('rD3', !!state.noticed[3]);
+  const bs = document.getElementById('rBigStamp');
+  bs.textContent = state.score === 3 ? '観測完了' : state.score === 0 ? '封印' : '観測継続';
+  bs.style.color = state.score === 0 ? '#555' : '#b03a3a';
+  const rd = new Date();
+  document.getElementById('rDate').textContent = 'ARCHIVE No. K-07 ／ ' + rd.getFullYear() + '.' + (rd.getMonth() + 1) + '.' + rd.getDate();
+  document.getElementById('resultTotal').textContent =
+    '報告した異常：' + state.score + ' / 3' +
+    (state.score === 3 ? ' ― 全部の異常に、気づけました。'
+      : state.score === 0 ? ' ― 全部、記録に流されました。'
+      : ' ― 気づけた異常と、流された異常があります。');
+  const h = load(KEY) || { plays: 0 };
+  save(KEY, {
+    plays: (h.plays || 0) + 1,
+    missed: missedNums.map(n => CHECK_NAMES[n]),
+    food: state.food, score: state.score
+  });
+  go('s-ending');
+}
+function saveResultImage() {
+  const cv = document.getElementById('resultCanvas');
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#f7f5ef'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.strokeStyle = '#999'; ctx.lineWidth = 2; ctx.strokeRect(28, 28, cv.width - 56, cv.height - 56);
+  ctx.fillStyle = '#1a1a1a'; ctx.textAlign = 'center';
+  ctx.font = '26px serif'; ctx.fillText('生活記録観測所', 440, 110);
+  ctx.font = '700 40px serif'; ctx.fillText('観測記録ファイル ― 表紙', 440, 180);
+  ctx.font = '24px serif'; ctx.fillText('ARCHIVE No. K-07 ／ 被験者Kの冷蔵庫 ／ 観測期間：7日間', 440, 235);
+  ctx.font = '30px serif'; ctx.textAlign = 'left';
+  const rows = [
+    ['練習記録 ― 記録0', state.practiceOk],
+    ['DAY 3 ― 🍇の出現', !!state.noticed[1]],
+    ['DAY 4 ― 🥚の増加', !!state.noticed[2]],
+    ['DAY 5 ― 🥦の回帰', !!state.noticed[3]]
+  ];
+  rows.forEach((r, i) => {
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText(r[0], 130, 380 + i * 80);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = r[1] ? '#b03a3a' : '#888';
+    ctx.fillText(r[1] ? '報告済み' : '未照合', 750, 380 + i * 80);
+    ctx.textAlign = 'left';
+  });
+  ctx.save();
+  ctx.translate(440, 800); ctx.rotate(-0.1);
+  ctx.strokeStyle = state.score === 0 ? '#555' : '#b03a3a'; ctx.lineWidth = 4;
+  const label = state.score === 3 ? '観測完了' : state.score === 0 ? '封印' : '観測継続';
+  ctx.font = '700 54px sans-serif';
+  const w = ctx.measureText(label).width + 70;
+  ctx.strokeRect(-w / 2, -52, w, 96);
+  ctx.fillStyle = ctx.strokeStyle; ctx.textAlign = 'center';
+  ctx.fillText(label, 0, 20);
+  ctx.restore();
+  ctx.fillStyle = '#666'; ctx.font = '22px serif'; ctx.textAlign = 'center';
+  ctx.fillText('超常現象は、ない。あるのは、冷蔵庫と、嘘をつく記憶だけ', 440, 960);
+  if (state.will) {
+    ctx.fillStyle = '#1a1a1a'; ctx.font = '26px serif';
+    ctx.fillText('観測者の意思 ― ' + state.will, 440, 905);
+  }
+  const a = document.createElement('a');
+  a.download = 'kansoku-result.png';
+  a.href = cv.toDataURL('image/png');
+  a.click();
+}
+function chooseWill(w, btn) {
+  state.will = w;
+  const block = document.getElementById('willBlock');
+  block.querySelectorAll('button').forEach(b => b.classList.remove('picked'));
+  btn.classList.add('picked');
+  const rw = document.getElementById('rWill');
+  rw.textContent = '観測者の意思 ― ' + w;
+  rw.classList.remove('hidden');
+  document.getElementById('willMsg').textContent = '表紙に、書き加えられました。';
+  const fw = document.getElementById('finalWill');
+  if (fw) fw.textContent = 'あなたの意思 ― ' + w;
+}
+function shareRecord() {
+  const text = '観測記録K｜被験者Kの冷蔵庫を、1週間観測した記録。';
+  const url = location.href;
+  if (navigator.share) { navigator.share({ title: '観測記録K', text, url }).catch(() => {}); }
+  else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text + ' ' + url).then(() => alert('リンクをコピーしました'));
+  }
+}
+function resetHistory() { try { localStorage.removeItem(KEY); } catch (e) {} location.reload(); }
+</script>
+</body>
+</html>
