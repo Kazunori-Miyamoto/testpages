@@ -90,8 +90,9 @@
   .glimpse { opacity: .38; filter: blur(1.2px); }
   .stamp {
     display: inline-block; border: 2px solid currentColor; border-radius: 4px;
-    padding: 4px 12px; transform: rotate(-3deg);
+    padding: 4px 12px; transform: rotate(-2deg);
     font-family: ui-monospace, Menlo, monospace; font-size: 14px;
+    margin: 16px auto 34px;
   }
   .stamp-red { color: #e06666; }
   .stamp-gray { color: #888; }
@@ -194,7 +195,7 @@
   <p class="ts">DAY 1 ― 初期観測</p>
   <div class="doc">
     <p class="dlabel">【資料】本人の申告</p>
-    <p>観測者：卵について、教えてください。<br>K：「卵は、常にあります。切らしたこと、ないですね」</p>
+    <p>観測者：卵について、教えてください。<br>K：「卵は、常にあります」</p>
   </div>
   <div class="fridgebox">
     <button class="primary" id="open-day1" onclick="openFridge('day1')">冷蔵庫を開ける</button>
@@ -232,8 +233,8 @@
     <p>🍞 ×1<br>🧻 ×1<br>🍙 ×1<br>※いずれも、冷蔵庫の外で保管されるもの</p>
   </div>
   <div class="doc">
-    <p class="dlabel">【資料2】本人の申告（食べたもの）</p>
-    <p>K：「🥩を食べました。🥛を1本、飲みました」</p>
+    <p class="dlabel">【資料2】本人の申告</p>
+    <p>K：「🥩を食べた。🥛を1本飲んだ」</p>
   </div>
   <div class="fridgebox">
     <button class="primary" id="open-day2" onclick="openFridge('day2')">冷蔵庫を開ける</button>
@@ -274,7 +275,7 @@
     <p>🥫 ×1<br>🥛 ×1<br>※🥫は、棚で保管</p>
   </div>
   <div class="doc">
-    <p class="dlabel">【資料2】本人の申告（食べたもの）</p>
+    <p class="dlabel">【資料2】本人の申告</p>
     <p>本日、申告はありません。</p>
   </div>
   <div class="fridgebox">
@@ -292,7 +293,7 @@
     <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
     <div class="choices">
       <button onclick="answerCheck(1,false,this)">異常なしとして処理する</button>
-      <button onclick="answerCheck(1,true,this)">齟齬として報告する</button>
+      <button onclick="answerCheck(1,true,this)">異常として報告する</button>
     </div>
     <p class="reaction" id="check1Msg"></p>
     <p class="stamp hidden" id="stamp1"></p>
@@ -337,7 +338,7 @@
     <p><strong>観測者への確認：卵の増加を、どう所見しますか？</strong></p>
     <div class="choices">
       <button onclick="answerCheck(2,false,this)">異常なしとして処理する</button>
-      <button onclick="answerCheck(2,true,this)">齟齬として報告する</button>
+      <button onclick="answerCheck(2,true,this)">異常として報告する</button>
     </div>
     <p class="reaction" id="check2Msg"></p>
     <p class="stamp hidden" id="stamp2"></p>
@@ -380,7 +381,7 @@
     <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
     <div class="choices">
       <button onclick="answerCheck(3,false,this)">異常なしとして処理する</button>
-      <button onclick="answerCheck(3,true,this)">齟齬として報告する</button>
+      <button onclick="answerCheck(3,true,this)">異常として報告する</button>
     </div>
     <p class="reaction" id="check3Msg"></p>
     <p class="stamp hidden" id="stamp3"></p>
@@ -690,7 +691,7 @@ function answerCheck(n, noticed, btn) {
   const st = document.getElementById('stamp' + n);
   if (st) {
     st.classList.remove('hidden');
-    if (noticed) { st.textContent = '観測者所見 ― 齟齬として報告済み'; st.classList.add('stamp-red'); }
+    if (noticed) { st.textContent = '観測者所見 ― 異常として報告済み'; st.classList.add('stamp-red'); }
     else { st.textContent = '観測者所見 ― 異常なしとして処理（未照合）'; st.classList.add('stamp-gray'); }
   }
   const next = document.getElementById('toDay' + (n + 3));
