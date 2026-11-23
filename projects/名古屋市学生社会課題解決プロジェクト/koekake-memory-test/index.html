@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>記憶と声かけのテスト（手元プロトタイプ）</title>
+  <style>
+    :root {
+      --bg: #f6f6f4;
+      --ink: #171717;
+      --muted: #666666;
+      --line: #171717;
+      --card: #ffffff;
+      --accent-soft: #eaeae6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      line-height: 1.75;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: rgba(246, 246, 244, 0.92);
+      border-bottom: 1px solid #d8d8d4;
+      font-size: 12px;
+      color: var(--muted);
+      backdrop-filter: blur(4px);
+    }
+
+    .topbar button {
+      background: transparent;
+      border: 1px solid #999;
+      color: var(--ink);
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .topbar button:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 64px 20px 120px;
+    }
+
+    /* ステージ（1画面以上の縦幅で大きくスクロールさせる） */
+    .stage {
+      min-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 24px;
+      margin-bottom: 44vh;
+      background: var(--card);
+      border: 1.5px solid var(--line);
+      opacity: 0.35;
+      transition: opacity 0.35s ease;
+    }
+
+    .stage.active {
+      opacity: 1;
+    }
+
+    .stage.locked {
+      opacity: 0.72;
+    }
+
+    .stage-label {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* FPS視点：正面の棒人間＋絵文字 */
+    .fps-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 12px 0 24px;
+    }
+
+    .mood-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 28px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .mood-sub {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .stickman {
+      width: 84px;
+      height: 112px;
+      overflow: visible;
+    }
+
+    .speech {
+      background: var(--accent-soft);
+      border: 1.5px solid var(--line);
+      padding: 16px 18px;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .prompt {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .choice-btn {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      background: #fff;
+      color: var(--ink);
+      border: 1.5px solid var(--line);
+      font-size: 15px;
+      line-height: 1.5;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .choice-btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .choice-btn:disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+
+    .choice-btn.selected {
+      background: var(--ink);
+      color: #fff;
+      opacity: 1;
+    }
+
+    /* エンディング */
+    .ending {
+      display: none;
+      min-height: 85vh;
+      padding: 48px 24px;
+      background: var(--card);
+      border: 2px solid var(--line);
+    }
+
+    .ending.visible {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .ending.glitch {
+      border-style: dashed;
+      background: #faf9f6;
+    }
+
+    .route-tag {
+      display: inline-block;
+      font-size: 12px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      margin-bottom: 16px;
+      width: fit-content;
+    }
+
+    .ending-title {
+      font-size: 22px;
+      margin: 0 0 18px;
+    }
+
+    .ending-body p {
+      margin: 0 0 14px;
+      font-size: 15px;
+    }
+
+    .log-box {
+      margin: 18px 0 24px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px dashed #888;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .cta-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .cta-link {
+      display: inline-block;
+      text-align: center;
+      text-decoration: none;
+      padding: 14px 18px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .cta-link:hover {
+      opacity: 0.88;
+    }
+
+    .retry-btn {
+      padding: 12px 16px;
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .retry-btn:hover {
+      background: var(--accent-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span id="status-info">周回目: 1回目</span>
+    <button type="button" id="reset-history-btn">履歴リセット</button>
+  </div>
+
+  <main class="container">
+    <!-- ステージ1：第1ターン -->
+    <section class="stage active" id="stage-1">
+      <div class="stage-label">STAGE 1 / 3 — FPS視点</div>
+      <div class="fps-view">
+        <div class="mood-badge">
+          <span>🧒</span>
+          <span class="mood-sub">😊</span>
+        </div>
+        <svg class="stickman" viewBox="0 0 84 112" aria-hidden="true">
+          <circle cx="42" cy="20" r="14" fill="none" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="34" x2="42" y2="74" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="46" x2="18" y2="64" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="46" x2="66" y2="64" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="74" x2="24" y2="106" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="74" x2="60" y2="106" stroke="#171717" stroke-width="2.5" />
+        </svg>
+      </div>
+      <div class="speech">「ねえ、ぼく、将来はせんせいになりたい！」</div>
+      <div class="prompt">何と声かけしますか？</div>
+      <div class="choices" id="choices-1">
+        <button class="choice-btn" data-turn="1" data-pick="A" data-score="1" data-text="いいね！どんなせんせいになりたい？">
+          いいね！どんなせんせいになりたい？
+        </button>
+        <button class="choice-btn" data-turn="1" data-pick="B" data-score="-1" data-text="いまの時代、せんせいは大変そうだよ？">
+          いまの時代、せんせいは大変そうだよ？
+        </button>
+        <button class="choice-btn" data-turn="1" data-pick="C" data-score="-2" data-text="やめておきなよ。もっと別のこと考えな">
+          やめておきなよ。もっと別のこと考えな
+        </button>
+      </div>
+    </section>
+
+    <!-- ステージ2：第2ターン -->
+    <section class="stage" id="stage-2">
+      <div class="stage-label">STAGE 2 / 3 — FPS視点</div>
+      <div class="fps-view">
+        <div class="mood-badge">
+          <span>🧒</span>
+          <span class="mood-sub" id="mood-2">😊</span>
+        </div>
+        <svg class="stickman" viewBox="0 0 84 112" aria-hidden="true">
+          <circle cx="42" cy="20" r="14" fill="none" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="34" x2="42" y2="74" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="46" x2="18" y2="64" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="46" x2="66" y2="64" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="74" x2="24" y2="106" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="74" x2="60" y2="106" stroke="#171717" stroke-width="2.5" />
+        </svg>
+      </div>
+      <div class="speech" id="speech-2">（第1ターンの選択に応じて表示されます）</div>
+      <div class="prompt" id="prompt-2">どう答えますか？</div>
+      <div class="choices" id="choices-2"></div>
+    </section>
+
+    <!-- ステージ3：第3ターン -->
+    <section class="stage" id="stage-3">
+      <div class="stage-label">STAGE 3 / 3 — FPS視点</div>
+      <div class="fps-view">
+        <div class="mood-badge">
+          <span>🧒</span>
+          <span class="mood-sub" id="mood-3">😟</span>
+        </div>
+        <svg class="stickman" viewBox="0 0 84 112" aria-hidden="true">
+          <circle cx="42" cy="20" r="14" fill="none" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="34" x2="42" y2="74" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="46" x2="18" y2="64" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="46" x2="66" y2="64" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="74" x2="24" y2="106" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="74" x2="60" y2="106" stroke="#171717" stroke-width="2.5" />
+        </svg>
+      </div>
+      <div class="speech">「……そっか。せんせいになるのって、やっぱりむずかしいのかな。」</div>
+      <div class="prompt">最後に、どんな言葉を残しますか？</div>
+      <div class="choices" id="choices-3">
+        <button class="choice-btn" data-turn="3" data-pick="F1" data-score="2" data-text="むずかしいこともあるけど、きみがなりたいなら応援するよ">
+          むずかしいこともあるけど、きみがなりたいなら応援するよ
+        </button>
+        <button class="choice-btn" data-turn="3" data-pick="F2" data-score="-1" data-text="まあ、本人がどうしてもっていうなら…ね">
+          まあ、本人がどうしてもっていうなら…ね
+        </button>
+        <button class="choice-btn" data-turn="3" data-pick="F3" data-score="-2" data-text="現実的に考えたら、ほかの道を探したほうがいいかもね">
+          現実的に考えたら、ほかの道を探したほうがいいかもね
+        </button>
+      </div>
+    </section>
+
+    <!-- エンディング -->
+    <section class="ending" id="ending-section">
+      <div class="route-tag" id="ending-tag">RESULT</div>
+      <div class="fps-view">
+        <div class="mood-badge">
+          <span>🧒</span>
+          <span class="mood-sub" id="ending-mood">😊</span>
+        </div>
+        <svg class="stickman" viewBox="0 0 84 112" aria-hidden="true">
+          <circle cx="42" cy="20" r="14" fill="none" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="34" x2="42" y2="74" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="46" x2="18" y2="64" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="46" x2="66" y2="64" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="74" x2="24" y2="106" stroke="#171717" stroke-width="2.5" />
+          <line x1="42" y1="74" x2="60" y2="106" stroke="#171717" stroke-width="2.5" />
+        </svg>
+      </div>
+      <h2 class="ending-title" id="ending-title"></h2>
+      <div class="ending-body" id="ending-body"></div>
+      <div class="log-box" id="ending-log"></div>
+      <div class="cta-group">
+        <a class="cta-link" id="ending-cta" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <button type="button" class="retry-btn" id="play-again-btn">もう一度やってみる（スクロール先頭へ）</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "koekake_memory_test_v1";
+    const URL_NAGOYA = "https://www.city.nagoya.jp/shisei/saiyou/1004301/1004438/index.html";
+    const URL_MEXT = "https://www.mext.go.jp/kids/find/kyoiku/mext_0005.html";
+
+    const STAGE2_DATA = {
+      A: {
+        mood: "😊",
+        speech: "「えへへ、ぼくね、みんなが笑えるクラスにしたいんだ！でもさ、最近テレビとかで『せんせいは忙しい』って聞くんだよね…」",
+        prompt: "どう答えますか？",
+        options: [
+          { pick: "A-1", score: 2, text: "忙しい日もあるけど、すごくやりがいがある仕事だよ" },
+          { pick: "A-2", score: -1, text: "たしかに、休みが少ないって聞くよね…" }
+        ]
+      },
+      B: {
+        mood: "😟",
+        speech: "「そっか……大変なんだ。でも、子どもたちと勉強したり遊んだりするのって、楽しそうなんだけどな」",
+        prompt: "どう続けますか？",
+        options: [
+          { pick: "B-1", score: -2, text: "楽しいことばかりじゃないのがオトナの世界なんだよ" },
+          { pick: "B-2", score: 1, text: "楽しそうって思える気持ちは、すごく大切だね" }
+        ]
+      },
+      C: {
+        mood: "🥲",
+        speech: "「……うん。ぼくの友だちのおうちでも、『せんせいだけはやめとけ』って言われた子がいたよ」",
+        prompt: "どう返しますか？",
+        options: [
+          { pick: "C-1", score: -2, text: "みんなの親がそう言うなら、そういうことなんだよ" },
+          { pick: "C-2", score: 1, text: "ほかの人がどう言っても、きみの気持ちはどうなの？" }
+        ]
+      }
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          return { playCount: 0, firstRunWasNegative: null, history: [] };
+        }
+        return JSON.parse(raw);
+      } catch {
+        return { playCount: 0, firstRunWasNegative: null, history: [] };
+      }
+    }
+
+    function saveState(state) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {}
+    }
+
+    let persistentState = loadState();
+    let currentRun = { t1: null, t2: null, t3: null, score: 0 };
+
+    function updateTopbar() {
+      const currentAttempt = persistentState.playCount + 1;
+      document.getElementById("status-info").textContent =
+        `周回目: ${currentAttempt}回目（完了済み: ${persistentState.playCount}回）`;
+    }
+
+    function scrollToElement(el) {
+      el.classList.add("active");
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 120);
+    }
+
+    function lockButtons(containerId, chosenBtn) {
+      const btns = document.querySelectorAll(`#${containerId} .choice-btn`);
+      btns.forEach((btn) => {
+        btn.disabled = true;
+        if (btn === chosenBtn) btn.classList.add("selected");
+      });
+    }
+
+    function setupStage2(pick1) {
+      const data = STAGE2_DATA[pick1];
+      document.getElementById("mood-2").textContent = data.mood;
+      document.getElementById("speech-2").textContent = data.speech;
+      document.getElementById("prompt-2").textContent = data.prompt;
+
+      const choicesEl = document.getElementById("choices-2");
+      choicesEl.innerHTML = "";
+
+      data.options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "choice-btn";
+        btn.dataset.turn = "2";
+        btn.dataset.pick = opt.pick;
+        btn.dataset.score = String(opt.score);
+        btn.dataset.text = opt.text;
+        btn.textContent = opt.text;
+        btn.addEventListener("click", () => handleTurn2(btn));
+        choicesEl.appendChild(btn);
+      });
+    }
+
+    function handleTurn1(btn) {
+      if (currentRun.t1) return;
+      currentRun.t1 = {
+        pick: btn.dataset.pick,
+        score: Number(btn.dataset.score),
+        text: btn.dataset.text
+      };
+      currentRun.score += currentRun.t1.score;
+
+      lockButtons("choices-1", btn);
+      document.getElementById("stage-1").classList.add("locked");
+      setupStage2(currentRun.t1.pick);
+      scrollToElement(document.getElementById("stage-2"));
+    }
+
+    function handleTurn2(btn) {
+      if (currentRun.t2) return;
+      currentRun.t2 = {
+        pick: btn.dataset.pick,
+        score: Number(btn.dataset.score),
+        text: btn.dataset.text
+      };
+      currentRun.score += currentRun.t2.score;
+
+      lockButtons("choices-2", btn);
+      document.getElementById("stage-2").classList.add("locked");
+
+      const mood3 = currentRun.score >= 1 ? "😟" : "☹️";
+      document.getElementById("mood-3").textContent = mood3;
+      scrollToElement(document.getElementById("stage-3"));
+    }
+
+    function handleTurn3(btn) {
+      if (currentRun.t3) return;
+      currentRun.t3 = {
+        pick: btn.dataset.pick,
+        score: Number(btn.dataset.score),
+        text: btn.dataset.text
+      };
+      currentRun.score += currentRun.t3.score;
+
+      lockButtons("choices-3", btn);
+      document.getElementById("stage-3").classList.add("locked");
+      evaluateAndRenderEnding();
+    }
+
+    function evaluateAndRenderEnding() {
+      const isSecondOrLater = persistentState.playCount >= 1;
+      const prevWasNegative = persistentState.firstRunWasNegative === true;
+      const currentIsPositive = currentRun.score >= 2;
+      const currentIsConsistentlyPositive =
+        currentRun.t1.pick === "A" &&
+        currentRun.t2.pick === "A-1" &&
+        currentRun.t3.pick === "F1";
+
+      let route = "R1";
+      if (isSecondOrLater && prevWasNegative && currentIsPositive) {
+        route = "R2";
+      } else if (!isSecondOrLater && currentIsConsistentlyPositive) {
+        route = "R3";
+      } else if (isSecondOrLater && currentIsConsistentlyPositive && !prevWasNegative) {
+        route = "R3";
+      } else if (currentRun.score >= 2) {
+        route = "R3";
+      } else {
+        route = "R1";
+      }
+
+      // 初回プレイの傾向を記録
+      if (persistentState.playCount === 0) {
+        persistentState.firstRunWasNegative = currentRun.score < 2;
+      }
+      persistentState.playCount += 1;
+      persistentState.history.push({
+        run: persistentState.playCount,
+        route,
+        score: currentRun.score,
+        picks: [currentRun.t1.pick, currentRun.t2.pick, currentRun.t3.pick]
+      });
+      saveState(persistentState);
+      updateTopbar();
+
+      const endingEl = document.getElementById("ending-section");
+      const tagEl = document.getElementById("ending-tag");
+      const moodEl = document.getElementById("ending-mood");
+      const titleEl = document.getElementById("ending-title");
+      const bodyEl = document.getElementById("ending-body");
+      const logEl = document.getElementById("ending-log");
+      const ctaEl = document.getElementById("ending-cta");
+
+      endingEl.classList.remove("glitch");
+
+      if (route === "R2") {
+        endingEl.classList.add("glitch");
+        tagEl.textContent = "#r/2/ — やり直しの記録（LocalStorage参照）";
+        moodEl.textContent = "☹️";
+        titleEl.textContent = "「……さっきは『むずかしいかも』って言ったのに。」";
+        bodyEl.innerHTML = `
+          <p>「急に『応援する』って言われても、もう前みたいに思えないよ。」</p>
+          <p>この画面では、何度でもやり直すことができます。けれど、現実の会話に「リセットボタン」はありません。最初に交わされた言葉は、相手の記憶に残ります。</p>
+        `;
+        ctaEl.textContent = "名古屋市の教員の魅力を知る ＞";
+        ctaEl.href = URL_NAGOYA;
+      } else if (route === "R3") {
+        tagEl.textContent = "#r/3/ — 未来の伴走者";
+        moodEl.textContent = "😊";
+        titleEl.textContent = "あなたのその一言が、未来の先生をつくる第一歩になります。";
+        bodyEl.innerHTML = `
+          <p>子どもの「やってみたい」「なりたい」を守ることは、未来の教室と子どもたちを守ることにつながっています。</p>
+        `;
+        ctaEl.textContent = "先生へのなり方を見る ＞";
+        ctaEl.href = URL_MEXT;
+      } else {
+        tagEl.textContent = "#r/1/ — 言葉の重さ";
+        moodEl.textContent = "🥲";
+        titleEl.textContent = "知っていますか？オトナの何気ないひと言で、子どもの夢は揺らぎます。";
+        bodyEl.innerHTML = `
+          <p>「夢のない子どもが多いな」と言う声もありますが、その夢を先に諦めさせたのは誰でしょうか？</p>
+        `;
+        ctaEl.textContent = "名古屋市の教員の魅力を知る ＞";
+        ctaEl.href = URL_NAGOYA;
+      }
+
+      logEl.textContent =
+        `今回の選択: ${currentRun.t1.pick} → ${currentRun.t2.pick} → ${currentRun.t3.pick}（スコア: ${currentRun.score}） / 累計プレイ: ${persistentState.playCount}回`;
+
+      endingEl.classList.add("visible");
+      scrollToElement(endingEl);
+    }
+
+    function resetCurrentRunAndScrollTop() {
+      currentRun = { t1: null, t2: null, t3: null, score: 0 };
+
+      document.querySelectorAll(".stage").forEach((s, idx) => {
+        s.classList.remove("locked");
+        if (idx === 0) s.classList.add("active");
+        else s.classList.remove("active");
+      });
+
+      document.querySelectorAll("#choices-1 .choice-btn").forEach((b) => {
+        b.disabled = false;
+        b.classList.remove("selected");
+      });
+
+      document.getElementById("choices-2").innerHTML = "";
+      document.getElementById("speech-2").textContent = "（第1ターンの選択に応じて表示されます）";
+
+      document.querySelectorAll("#choices-3 .choice-btn").forEach((b) => {
+        b.disabled = false;
+        b.classList.remove("selected");
+      });
+
+      const endingEl = document.getElementById("ending-section");
+      endingEl.classList.remove("visible", "glitch");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.querySelectorAll("#choices-1 .choice-btn").forEach((btn) => {
+      btn.addEventListener("click", () => handleTurn1(btn));
+    });
+
+    // ※ここから下は、貼り付け時に途切れていた部分を補完しています
+    document.querySelectorAll("#choices-3 .choice-btn").forEach((btn) => {
+      btn.addEventListener("click", () => handleTurn3(btn));
+    });
+
+    document.getElementById("play-again-btn").addEventListener("click", () => {
+      resetCurrentRunAndScrollTop();
+    });
+
+    document.getElementById("reset-history-btn").addEventListener("click", () => {
+      if (!confirm("プレイ履歴（周回数・初回の選択傾向）をリセットしますか？")) return;
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {}
+      persistentState = { playCount: 0, firstRunWasNegative: null, history: [] };
+      updateTopbar();
+      resetCurrentRunAndScrollTop();
+    });
+
+    updateTopbar();
+  </script>
+</body>
+</html>
