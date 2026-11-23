@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="color-scheme" content="light only">
-<meta name="description" content="3秒だけ見た冷蔵庫、レジでも覚えていますか？ 3分で体験する、買い物と記憶のテスト。">
+<meta name="description" content="冷蔵庫は、覚えるものじゃない。見るものだ。3分で体験する、買い物と記憶のテスト。">
 <title>冷蔵庫の記憶テスト</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,21 +20,21 @@
     padding: 32px 20px; gap: 18px;
   }
   .face { font-size: 72px; line-height: 1.2; }
-  .big { font-size: 44px; line-height: 1.5; }
+  .big { font-size: 40px; line-height: 1.5; }
   h1 { font-size: 30px; font-weight: 700; }
   h2 { font-size: 22px; font-weight: 700; }
   p { font-size: 17px; max-width: 30em; }
   .small { font-size: 13px; color: #666; max-width: 30em; }
   .grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    font-size: 40px; line-height: 1.4;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    font-size: 30px; line-height: 1.4; width: min(92vw, 430px);
   }
   .grid div {
-    border: 2px solid #eee; border-radius: 12px; padding: 14px 10px; min-width: 140px;
-    letter-spacing: 2px;
+    border: 2px solid #eee; border-radius: 12px; padding: 12px 4px;
+    letter-spacing: 1px; min-height: 64px; display:flex; align-items:center; justify-content:center;
   }
-  .grid.mini { font-size: 24px; }
-  .grid.mini div { min-width: 92px; padding: 8px 6px; }
+  .grid.mini { font-size: 20px; width: min(92vw, 340px); }
+  .grid.mini div { min-height: 48px; padding: 6px 2px; }
   .choices { display: flex; flex-direction: column; gap: 12px; width: min(92vw, 420px); }
   button, a.btn {
     font: inherit; font-size: 17px; padding: 14px 18px; border-radius: 999px;
@@ -48,16 +48,21 @@
   .palette { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 420px; }
   .palette button { width: 68px; height: 68px; font-size: 34px; padding: 0; border-radius: 16px; }
   .palette button.picked { background: #222; }
-  .basket { font-size: 30px; letter-spacing: 3px; min-height: 1.6em; }
+  .basket { font-size: 28px; letter-spacing: 3px; min-height: 1.6em; }
   .basket.over { color: #c0392b; font-weight: 700; }
+  .reaction { font-size: 19px; font-weight: 700; min-height: 1.7em; }
+  .pressure { color: #c0392b; font-weight: 700; }
   .card {
     border: 2px solid #eee; border-radius: 16px; padding: 22px 18px;
     display: flex; flex-direction: column; gap: 12px; align-items: center;
     width: min(92vw, 460px);
   }
   .hidden { display: none !important; }
-  .strike { text-decoration: line-through; color: #999; }
-  #timer { font-size: 40px; font-weight: 700; min-height: 1.4em; }
+  #timer, #timer3 { font-size: 40px; font-weight: 700; min-height: 1.4em; }
+  .receipt {
+    border: 2px dashed #bbb; border-radius: 8px; padding: 18px 26px;
+    font-size: 22px; line-height: 2; letter-spacing: 2px;
+  }
 </style>
 </head>
 <body>
@@ -98,67 +103,73 @@
 <section id="s2">
   <div class="face">🚪</div>
   <h2>あなたの冷蔵庫を見せます。</h2>
-  <p>見られるのは、3秒だけです。<br>中身を覚えてください。</p>
+  <p>見られるのは、3秒だけです。<br>全部は、覚えられません。それでいいんです。</p>
   <div class="choices">
     <button class="primary" onclick="openFridge()">冷蔵庫を開ける</button>
   </div>
 </section>
 
-<!-- 3. 冷蔵庫（3秒） -->
+<!-- 3. 冷蔵庫（3秒・3×3＝9品、うち出題に関係するのは一部だけ） -->
 <section id="s3">
   <div id="timer">3</div>
   <div class="grid" id="fridgeGrid">
-    <div>🥛🥛</div><div>🥚🥚🥚</div>
-    <div>🥕🥕</div><div>🥦</div>
+    <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>🥩</div><div>🍎🍎</div>
   </div>
   <p id="fridgeMsg">……覚えましたか？</p>
 </section>
 
-<!-- Q1 -->
+<!-- Q1：無いもの。買う＝安心（リターン）／買わない＝明日の朝の不安（コスト） -->
 <section id="q1">
-  <div class="face">😋</div>
+  <div class="face" id="q1Face">😋</div>
   <div class="big">🍞</div>
   <p>パン。冷蔵庫にも、戸棚にも無かったはず。</p>
-  <p>「朝ごはんにすれば、食べ切れる」</p>
+  <p>買えば、明日の朝は安心。<br>買わなければ、明日の朝、食べるものがない。</p>
   <div class="choices">
     <button onclick="answer(1,'buy',this)">🛒➕🍞 カゴに入れる</button>
     <button onclick="answer(1,'skip',this)">🚫🍞 買わない</button>
   </div>
+  <p class="reaction" data-reaction></p>
   <div class="basket" data-basket></div>
 </section>
 
-<!-- Q2 -->
+<!-- Q2：特売。買う＝一番いい顔／見送る＝損した気分（見えるコスト） -->
 <section id="q2">
-  <div class="face">😆</div>
+  <div class="face" id="q2Face">😆</div>
   <div class="big">🥚🥚🥚🥚🥚🥚</div>
   <p>卵6個、特売。🏷️🪙🪙 → 🪙</p>
+  <p class="pressure">残り、2つだけ。</p>
   <p>「安い！ 家にあった気もするけど、買って損はない」</p>
   <div class="choices">
     <button onclick="answer(2,'buy',this)">🛒➕🥚 カゴに入れる</button>
-    <button onclick="answer(2,'skip',this)">🚫🥚 買わない</button>
+    <button onclick="answer(2,'skip',this)">🚫🥚 見送る</button>
   </div>
+  <p class="reaction" data-reaction></p>
   <div class="basket" data-basket></div>
 </section>
 
-<!-- Q3 -->
+<!-- Q3：安売り＋記憶の書き換え。買う＝ほぼタダの喜び／見送る＝前回の二の舞を避ける痛み -->
 <section id="q3">
-  <div class="face">😵‍💫</div>
+  <div class="face" id="q3Face">😵‍💫</div>
   <div class="grid mini" aria-hidden="true">
-    <div>🥛🥛</div><div>🥚🥚🥚</div>
-    <div>🥕🥕</div><div>⬛</div>
+    <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>⬛</div><div>🍅🍅</div>
+    <div>🍌</div><div>🥩</div><div>🍎🍎</div>
   </div>
-  <p>……あれ、右下のマス、何が入ってたっけ？</p>
+  <p>……あれ、真ん中のマス、何が入ってたっけ？</p>
   <div class="big" id="q3Food">🍌</div>
-  <p id="q3Line">あなたが「余らせてしまう」と選んだ食材。今日は安売り。</p>
+  <p id="q3Line">あなたが「余らせてしまう」と選んだ食材。今日は安売り。🪙1枚。</p>
   <p>「安いし、明日使えばいい」</p>
   <div class="choices">
     <button id="q3Buy" onclick="answer(3,'buy',this)">🛒➕ カゴに入れる</button>
     <button onclick="answer(3,'skip',this)">🚫 買わない</button>
   </div>
+  <p class="reaction" data-reaction></p>
   <div class="basket" data-basket></div>
 </section>
 
-<!-- メタ：カゴの突きつけ（Q2・Q3両方買った人だけ表示） -->
+<!-- メタ：カゴの突きつけ（Q2・Q3両方買った人だけ） -->
 <section id="meta" class="hidden">
   <div class="face">👁️</div>
   <div class="basket over" id="metaBasket"></div>
@@ -194,26 +205,56 @@
   <div class="face" id="threeFace">😐</div>
   <p id="threeText"></p>
   <div class="choices">
-    <button class="primary" onclick="showWeek()">つづける</button>
+    <button class="primary" onclick="showReceipt()">レシートを見る</button>
   </div>
 </section>
 
-<!-- 1週間後 -->
+<!-- レシート：買っていないものが混ざっている（偽の記憶の混入） -->
+<section id="s-receipt">
+  <div class="face">🧾</div>
+  <h2>レシート</h2>
+  <div class="receipt" id="receiptBody">🍞<br>🥚<br>🍇</div>
+  <p class="small">……よく見てください。このレシートが、あなたの記憶になります。</p>
+  <div class="choices">
+    <button class="primary" onclick="go('s-home')">家に帰る</button>
+  </div>
+</section>
+
+<!-- 帰宅：冷蔵庫を開け直す（最初との間違い探し） -->
+<section id="s-home">
+  <div class="face">🚪</div>
+  <h2>家に着きました。冷蔵庫を開けてください。</h2>
+  <div class="grid" id="homeGrid">
+    <div>🥛🥛</div><div id="homeEggs">🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>🥩</div><div>🍇</div>
+  </div>
+  <p>最初には無かったものが、1つ増えています。<br>最初に無かったのは、どっち？</p>
+  <div class="choices">
+    <button onclick="answerHome('cheese',this)">🧀 チーズ</button>
+    <button onclick="answerHome('grape',this)">🍇 ぶどう</button>
+  </div>
+  <p class="reaction" id="homeReaction"></p>
+</section>
+
+<!-- 1週間後：行為の反転＋言い訳の再生＋年額換算 -->
 <section id="s-week">
   <div class="big">☀️🌙☀️🌙☀️🌙☀️</div>
   <p>——1週間後。</p>
   <div class="big" id="weekFoods">🍽️😋</div>
   <p id="weekText">カゴに入れたものは、全部食べ切れました。</p>
+  <p id="weekExcuse"></p>
   <p id="weekCoins" class="big"></p>
+  <p id="weekYear"></p>
   <div class="choices">
     <button class="primary" onclick="showEnding()">つづける</button>
   </div>
 </section>
 
-<!-- 結末 -->
+<!-- 結末：メインメッセージ -->
 <section id="s-ending">
-  <p>買ったときは、覚えていた。<br>レジに着く頃には、書き換わっていた。</p>
-  <h2 id="endingLine">あなたの一言が、決まります。</h2>
+  <h2>冷蔵庫は、覚えるものじゃない。<br>見るものだ。</h2>
+  <p id="endingLine">あなたの一言が、決まります。</p>
   <p id="repeatLine" class="small"></p>
   <div class="choices">
     <button class="primary" onclick="showCard()">記録を見る</button>
@@ -226,14 +267,16 @@
   <div class="card">
     <p class="small">最初に見た冷蔵庫</p>
     <div class="grid mini">
-      <div>🥛🥛</div><div>🥚🥚🥚</div>
-      <div>🥕🥕</div><div>🥦</div>
+      <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+      <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+      <div>🍌</div><div>🥩</div><div>🍎🍎</div>
     </div>
     <p id="cardWasted"></p>
     <p id="cardCoins"></p>
     <p id="cardTrap"></p>
     <p id="cardThree"></p>
-    <p>明日からの一言<br><strong>「レジの前に、冷蔵庫の写真を見る。」</strong></p>
+    <p id="cardGrape"></p>
+    <p>あなたの行動は、1つだけ<br><strong>買い物に行く前に、冷蔵庫の写真を1枚撮る。</strong></p>
     <p class="small" id="cardDate"></p>
   </div>
   <div class="choices">
@@ -249,18 +292,21 @@ const KEY = 'reizouko_v1';
 const state = {
   food: '🍌', foodPicked: false,
   answers: {}, pollution: 0, traps: [],
-  three: null, threeTimedOut: false, finished: false
+  three: null, noticedGrape: null, finished: false
 };
+const REACTIONS = {
+  1: { buy: '😋「よし、明日の朝は安心だ」', skip: '😖「……明日の朝、どうしよう」' },
+  2: { buy: '😆「得した！ 🪙が浮いた！」', skip: '😖「……損した気分。でも、家にあったはず」' },
+  3: { buy: '😍「ほぼタダじゃん！」', skip: '😐「……前にも、これで捨てた」' }
+};
+const FACES = { 1: 'q1Face', 2: 'q2Face', 3: 'q3Face' };
 
 function loadHistory() {
   try { return JSON.parse(localStorage.getItem(KEY)) || null; }
   catch (e) { return null; }
 }
-function go(id) {
-  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-}
+function go(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
 
-// 導入：2回目以降
 (function init() {
   const h = loadHistory();
   if (h && h.plays > 0) {
@@ -271,7 +317,6 @@ function go(id) {
   }
 })();
 
-// 入力：絵文字パレット
 document.getElementById('palette').addEventListener('click', function (e) {
   const b = e.target.closest('button'); if (!b) return;
   document.querySelectorAll('#palette button').forEach(x => x.classList.remove('picked'));
@@ -283,13 +328,10 @@ function confirmFood(skipped) {
   if (skipped) { state.food = '🍌'; state.foodPicked = false; }
   document.getElementById('q3Food').textContent = state.food;
   document.getElementById('q3Buy').textContent = '🛒➕' + state.food + ' カゴに入れる';
-  if (!state.foodPicked) {
-    document.getElementById('q3Line').textContent = 'バナナ。今日は安売り。';
-  }
+  if (!state.foodPicked) document.getElementById('q3Line').textContent = 'バナナ。今日は安売り。🪙1枚。';
   go('s2');
 }
 
-// 冷蔵庫：3秒
 let fridgeOpened = false;
 function openFridge() {
   if (fridgeOpened) return; fridgeOpened = true;
@@ -310,7 +352,6 @@ function openFridge() {
   }, 1000);
 }
 
-// 買い物：二択
 function basketItems() {
   const items = [];
   if (state.answers[1] === 'buy') items.push('🍞');
@@ -329,11 +370,13 @@ function answer(q, choice, btn) {
   if (state.answers[q]) return;
   state.answers[q] = choice;
   const sec = btn.closest('section');
-  sec.querySelectorAll('button').forEach(b => { b.disabled = true; });
+  sec.querySelectorAll('.choices button').forEach(b => { b.disabled = true; });
   btn.classList.add('picked'); btn.disabled = false;
   if (q === 1 && choice === 'skip') { state.pollution += 1; state.traps.push('買い忘れ'); }
   if (q === 2 && choice === 'buy')  { state.pollution += 2; state.traps.push('特売'); }
   if (q === 3 && choice === 'buy')  { state.pollution += 2; state.traps.push('安さ'); }
+  sec.querySelector('[data-reaction]').textContent = REACTIONS[q][choice];
+  if (choice === 'skip' && q > 1) document.getElementById(FACES[q]).textContent = '😖';
   renderBaskets();
   setTimeout(() => {
     if (q === 1) go('q2');
@@ -345,26 +388,21 @@ function answer(q, choice, btn) {
         go('meta');
       } else go('s-reg');
     }
-  }, 350);
+  }, 1100);
 }
 
-// 3秒の問い直し
-let threeTimer = null, threeNoLimit = false;
+let threeTimer = null;
 function startThree(noLimit) {
-  threeNoLimit = !!noLimit;
   go('s-three');
   const t = document.getElementById('timer3');
-  if (threeNoLimit) { t.textContent = '∞'; return; }
+  if (noLimit) { t.textContent = '∞'; return; }
   let n = 3; t.textContent = n;
   threeTimer = setInterval(() => {
     n--;
     if (n > 0) { t.textContent = n; }
     else {
       clearInterval(threeTimer); threeTimer = null;
-      if (state.three === null) {
-        state.three = 'timeout'; state.threeTimedOut = true;
-        finishThree();
-      }
+      if (state.three === null) { state.three = 'timeout'; finishThree(); }
     }
   }, 1000);
 }
@@ -377,7 +415,7 @@ function answerThree(choice, btn) {
 }
 function finishThree() {
   const ok = state.three === 'three';
-  document.getElementById('threeFace').textContent = ok ? ' 🙂' : '😵‍💫';
+  document.getElementById('threeFace').textContent = ok ? '🙂' : '😵‍💫';
   document.getElementById('threeText').innerHTML =
     '最初に見たとき：🥚🥚🥚 3個<br>' +
     (ok ? '3秒でも、思い出せました。<br>現実のレジでも、思い出せますか？'
@@ -385,31 +423,63 @@ function finishThree() {
   go('s-three-result');
 }
 
-// 1週間後
+function showReceipt() {
+  const items = basketItems();
+  const lines = items.length ? items.slice() : ['（何も買わなかった）'];
+  lines.push('🍇');
+  document.getElementById('receiptBody').innerHTML = lines.join('<br>');
+  if (state.answers[2] === 'buy') document.getElementById('homeEggs').textContent = '🥚🥚🥚🥚🥚🥚';
+  go('s-receipt');
+}
+function answerHome(choice, btn) {
+  if (state.noticedGrape !== null) return;
+  state.noticedGrape = (choice === 'grape');
+  const sec = btn.closest('section');
+  sec.querySelectorAll('.choices button').forEach(b => { b.disabled = true; });
+  btn.classList.add('picked'); btn.disabled = false;
+  if (!state.noticedGrape) { state.pollution += 1; state.traps.push('偽の記憶'); }
+  document.getElementById('homeReaction').textContent = state.noticedGrape
+    ? '🍇は、レシートにだけありました。よく気づきましたね。'
+    : '🧀は、最初からありました。🍇は、レシートが植えた記憶です。';
+  setTimeout(() => go('s-week'), 1400);
+  buildWeek();
+}
+
 function wastedItems() {
   const w = [];
   if (state.answers[2] === 'buy') w.push('🥚');
   if (state.answers[3] === 'buy') w.push(state.food);
   return w;
 }
-function showWeek() {
+function coinCount() {
+  return (state.answers[2] === 'buy' ? 2 : 0) + (state.answers[3] === 'buy' ? 1 : 0);
+}
+function buildWeek() {
   const w = wastedItems();
   if (w.length) {
     document.getElementById('weekFoods').textContent = w.join(' ') + ' → 🥀';
     document.getElementById('weekText').textContent =
       'カゴに入れる手が、そのままゴミ箱に捨てる手になっていました。余らせたのは ' + w.join(' ') + ' です。';
-    const coins = (state.answers[2] === 'buy' ? 2 : 0) + (state.answers[3] === 'buy' ? 1 : 0);
+    const excuses = [];
+    if (state.answers[2] === 'buy') excuses.push('「買って損はない」と言った卵は、冷蔵庫の奥で眠っていました。');
+    if (state.answers[3] === 'buy') excuses.push('「明日使えばいい」と言った' + state.food + 'の明日は、来ませんでした。');
+    document.getElementById('weekExcuse').textContent = excuses.join(' ');
+    const coins = coinCount();
     document.getElementById('weekCoins').textContent = '🗑️ ' + '🪙'.repeat(coins);
+    document.getElementById('weekYear').textContent =
+      '今週は 🪙×' + coins + '（約' + (coins * 100) + '円）。毎週繰り返せば、1年で約' +
+      (coins * 100 * 52).toLocaleString() + '円分が、ゴミ箱へ。';
+  } else if (state.answers[1] === 'skip') {
+    document.getElementById('weekText').textContent =
+      '捨てたものはありませんでした。ただ、最初の朝だけ、パンがありませんでした。';
   }
-  go('s-week');
 }
 
-// 結末
 function showEnding() {
   let line;
-  if (state.pollution === 0) line = '売り場で、記憶は守れました。';
-  else if (state.pollution === 1) line = '落ちたのは、' + (state.traps[0] || '') + 'でした。';
-  else line = '買ったときは、覚えていたはずでした。';
+  if (state.pollution === 0) line = '売り場でも、レシートでも、記憶は守れました。';
+  else if (state.pollution <= 2) line = 'あなたが弱いんじゃない。' + (state.traps[0] || '') + 'が、あなたの記憶より速かった。';
+  else line = '最初に見た冷蔵庫は、もうどこにもありません。あなたの記憶の中の冷蔵庫は、売り場が作ったものです。';
   document.getElementById('endingLine').textContent = line;
   const h = loadHistory();
   if (h && h.lastTraps && state.traps.some(t => h.lastTraps.includes(t))) {
@@ -419,22 +489,22 @@ function showEnding() {
   go('s-ending');
 }
 
-// 記録カード
 function showCard() {
   const w = wastedItems();
   document.getElementById('cardWasted').textContent =
     w.length ? '余らせたもの：' + w.join(' ') + ' 🥀' : '余らせたもの：ありません 🍽️';
-  const coins = (state.answers[2] === 'buy' ? 2 : 0) + (state.answers[3] === 'buy' ? 1 : 0);
+  const coins = coinCount();
   document.getElementById('cardCoins').textContent =
-    coins ? '捨てた金額：' + '🪙'.repeat(coins) + '（🪙＝約100円）' : '捨てた金額：🪙 0';
+    coins ? '捨てた金額：' + '🪙'.repeat(coins) + '（🪙＝約100円／1年では約' + (coins * 100 * 52).toLocaleString() + '円）' : '捨てた金額：🪙 0';
   document.getElementById('cardTrap').textContent =
     state.traps.length ? '落ちた罠：' + state.traps.join('・') : '落ちた罠：なし';
   document.getElementById('cardThree').textContent =
     '3秒の問い：' + (state.three === 'three' ? '思い出せた' : '書き換わっていた');
+  document.getElementById('cardGrape').textContent =
+    'レシートの🍇：' + (state.noticedGrape ? '気づいた（最初には、ありませんでした）' : '気づかなかった（最初には、ありませんでした）');
   const d = new Date();
   document.getElementById('cardDate').textContent =
     d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate();
-  // 履歴を保存（2回目演出・再犯判定用）
   const h = loadHistory() || { plays: 0 };
   h.plays = (h.plays || 0) + 1;
   h.lastWasted = w; h.lastTraps = state.traps;
@@ -444,7 +514,7 @@ function showCard() {
 }
 
 function shareCard() {
-  const text = '冷蔵庫の記憶テスト｜買ったときは、覚えていた。レジに着く頃には、書き換わっていた。';
+  const text = '冷蔵庫の記憶テスト｜冷蔵庫は、覚えるものじゃない。見るものだ。';
   const url = location.href;
   if (navigator.share) { navigator.share({ title: '冷蔵庫の記憶テスト', text, url }).catch(() => {}); }
   else if (navigator.clipboard) {
