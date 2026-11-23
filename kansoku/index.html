@@ -78,6 +78,14 @@
   .paper td { padding: 4px 2px; text-align: left; }
   .paper td.dots { text-align: right; letter-spacing: .25em; }
   .paper .sign { font-size: 18px; margin-top: 8px; }
+  .doc {
+    width: min(92vw, 480px); border: 1px solid #444; background: #0d0d0d;
+    padding: 14px 18px; text-align: left; line-height: 1.9;
+  }
+  .doc .dlabel { font-family: ui-monospace, Menlo, monospace; color: #9d9; font-size: 13px; letter-spacing: .12em; }
+  .doc.receipt-doc { background: #f7f5ef; color: #222; font-family: ui-monospace, Menlo, monospace; border: none; }
+  .doc.receipt-doc .dlabel { color: #666; }
+  .fridgebox { display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(92vw, 480px); }
 </style>
 </head>
 <body>
@@ -159,18 +167,25 @@
 
 <!-- Day1 -->
 <section id="day1">
-  <p class="ts">DAY 1 ― 08:00　初期観測</p>
-  <div id="g-day1"><div class="grid">
+  <p class="ts">DAY 1 ― 初期観測</p>
+  <div class="doc">
+    <p class="dlabel">【資料】本人の申告</p>
+    <p>観測者：卵について、教えてください。<br>K：「卵は、常にあります。切らしたこと、ないですね」</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day1" onclick="openFridge('day1')">冷蔵庫を開ける</button>
+    <div id="g-day1" class="hidden"><div class="grid">
     <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>🥩</div><div>🍐🍐</div>
   </div></div>
-  <div class="log">
-    <p class="q">観測者：卵について、教えてください。</p>
-    <p class="a">K：「卵は、常にあります。切らしたこと、ないですね」</p>
+    <p class="small hidden" id="closed-day1">（冷蔵庫は、閉じられました）</p>
+    <button class="hidden" id="close-day1" onclick="closeFridge('day1','post-day1')">冷蔵庫を閉じる</button>
   </div>
-  <div class="choices">
-    <button class="primary" onclick="go('gate1')">Day 1 の記録を閉じる</button>
+  <div id="post-day1" class="hidden">
+    <div class="choices">
+      <button class="primary" onclick="go('gate1')">Day 1 の記録を閉じる</button>
+    </div>
   </div>
 </section>
 
@@ -186,17 +201,30 @@
 
 <!-- Day2 -->
 <section id="day2">
-  <p class="ts">DAY 2 ― 19:42　購入記録あり</p>
-  <div class="receipt">🍞<br>🧻<br>🍙</div>
-  <p class="ts">DAY 2 ― 21:05　観測</p>
-  <div id="g-day2"><div class="grid">
+  <p class="ts">DAY 2 ― 19:42　買い物／21:05　観測</p>
+  <div class="doc receipt-doc">
+    <p class="dlabel">【資料1】購入記録（レシート）</p>
+    <p>🍞 ×1<br>🧻 ×1<br>🍙 ×1<br>※いずれも、冷蔵庫の外で保管されるもの</p>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】本人の申告（食べたもの）</p>
+    <p>K：「🥩を食べました。🥛を1本、飲みました」</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day2" onclick="openFridge('day2')">冷蔵庫を開ける</button>
+    <div id="g-day2" class="hidden"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍐</div>
   </div></div>
-  <p>購入品のうち🍞🧻🍙は、冷蔵庫の外で保管されるものとして記録されている。<br>🥩と🥛1本の減少は、Kの食事記録と一致。異常なし。</p>
-  <div class="choices">
-    <button class="primary" onclick="go('gate2')">Day 2 の記録を閉じる</button>
+    <p class="small hidden" id="closed-day2">（冷蔵庫は、閉じられました）</p>
+    <button class="hidden" id="close-day2" onclick="closeFridge('day2','post-day2')">冷蔵庫を閉じる</button>
+  </div>
+  <div id="post-day2" class="hidden">
+    <p>観測メモ：🥩と🥛1本の減少は、申告と一致。異常なし。</p>
+    <div class="choices">
+      <button class="primary" onclick="go('gate2')">Day 2 の記録を閉じる</button>
+    </div>
   </div>
 </section>
 
@@ -229,20 +257,35 @@
 <!-- Day3：齟齬1 -->
 <section id="day3">
   <p class="ts">DAY 3 ― 07:58　観測</p>
-  <div id="g-day3"><div class="grid">
+  <div class="doc receipt-doc">
+    <p class="dlabel">【資料1】購入記録（レシート）</p>
+    <p>🥫 ×1<br>🥛 ×1</p>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】本人の申告（食べたもの）</p>
+    <p>本日、申告はありません。</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day3" onclick="openFridge('day3')">冷蔵庫を開ける</button>
+    <div id="g-day3" class="hidden"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
-  <p>変化を確認：🍐が1つ減り、🍇が1つ増えた。<br>この日の購入記録は「🥫と🥛」だけです。</p>
-  <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
-  <div class="choices">
-    <button onclick="answerCheck(1,false,this)">異常なしとして処理する</button>
-    <button onclick="answerCheck(1,true,this)">齟齬として報告する</button>
+    <p class="small hidden" id="closed-day3">（冷蔵庫は、閉じられました）</p>
+    <button class="hidden" id="close-day3" onclick="closeFridge('day3','post-day3')">冷蔵庫を閉じる</button>
   </div>
-  <p class="reaction" id="check1Msg"></p>
-  <div class="choices">
-    <button class="primary hidden" id="toDay4" onclick="go('gate3')">Day 3 の記録を閉じる</button>
+  <div id="post-day3" class="hidden">
+    <p>観測メモ：資料と比べて、🍐が1つ減り、🍇が1つ増えています。</p>
+    <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
+    <div class="choices">
+      <button onclick="answerCheck(1,false,this)">異常なしとして処理する</button>
+      <button onclick="answerCheck(1,true,this)">齟齬として報告する</button>
+    </div>
+    <p class="reaction" id="check1Msg"></p>
+    <div class="choices">
+      <button class="primary hidden" id="toDay4" onclick="go('gate3')">Day 3 の記録を閉じる</button>
+    </div>
   </div>
 </section>
 
@@ -259,25 +302,35 @@
 <!-- Day4 -->
 <section id="day4">
   <p class="ts">DAY 4 ― 20:17　観測</p>
-  <div id="g-day4"><div class="grid">
+  <div class="doc receipt-doc">
+    <p class="dlabel">【資料1】購入記録（レシート）</p>
+    <p id="day4receipt">（照合中の食材）×2</p>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】本人の申告</p>
+    <p>観測者：卵について。<br>K：「卵は買ってないです。……買った、かな？」<br>同日 22:03 ― 廃棄の申告：🥦を廃棄した。</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day4" onclick="openFridge('day4')">冷蔵庫を開ける</button>
+    <div id="g-day4" class="hidden"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
-  <p id="day4food">ドアポケットの記録にも、変化があった。</p>
-  <div class="log">
-    <p class="q">観測者：卵が、増えています。</p>
-    <p class="a">K：「卵は買ってないです。……買った、かな？」</p>
-    <p class="ts">同日 22:03　廃棄記録：🥦 を廃棄した、と申告あり。</p>
+    <p class="small hidden" id="closed-day4">（冷蔵庫は、閉じられました）</p>
+    <button class="hidden" id="close-day4" onclick="closeFridge('day4','post-day4')">冷蔵庫を閉じる</button>
   </div>
-  <p><strong>観測者への確認：卵の増加を、どう所見しますか？</strong></p>
-  <div class="choices">
-    <button onclick="answerCheck(2,false,this)">異常なしとして処理する</button>
-    <button onclick="answerCheck(2,true,this)">齟齬として報告する</button>
-  </div>
-  <p class="reaction" id="check2Msg"></p>
-  <div class="choices">
-    <button class="primary hidden" id="toDay5" onclick="go('gate4')">Day 4 の記録を閉じる</button>
+  <div id="post-day4" class="hidden">
+    <p>観測メモ：卵が、3個から6個に増えています。</p>
+    <p><strong>観測者への確認：卵の増加を、どう所見しますか？</strong></p>
+    <div class="choices">
+      <button onclick="answerCheck(2,false,this)">異常なしとして処理する</button>
+      <button onclick="answerCheck(2,true,this)">齟齬として報告する</button>
+    </div>
+    <p class="reaction" id="check2Msg"></p>
+    <div class="choices">
+      <button class="primary hidden" id="toDay5" onclick="go('gate4')">Day 4 の記録を閉じる</button>
+    </div>
   </div>
 </section>
 
@@ -294,20 +347,35 @@
 <!-- Day5：齟齬2 -->
 <section id="day5">
   <p class="ts">DAY 5 ― 08:11　観測</p>
-  <div id="g-day5"><div class="grid">
+  <div class="doc receipt-doc">
+    <p class="dlabel">【資料1】購入記録（レシート）</p>
+    <p>本日、購入記録はありません。</p>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】本人の申告</p>
+    <p>本日、申告はありません。<br>※昨日の申告：🥦を廃棄した（Day 4 ― 22:03）。</p>
+  </div>
+  <div class="fridgebox">
+    <button class="primary" id="open-day5" onclick="openFridge('day5')">冷蔵庫を開ける</button>
+    <div id="g-day5" class="hidden"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
-  <p>昨日、廃棄の申告があった🥦が、同じ位置にある。</p>
-  <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
-  <div class="choices">
-    <button onclick="answerCheck(3,false,this)">異常なしとして処理する</button>
-    <button onclick="answerCheck(3,true,this)">齟齬として報告する</button>
+    <p class="small hidden" id="closed-day5">（冷蔵庫は、閉じられました）</p>
+    <button class="hidden" id="close-day5" onclick="closeFridge('day5','post-day5')">冷蔵庫を閉じる</button>
   </div>
-  <p class="reaction" id="check3Msg"></p>
-  <div class="choices">
-    <button class="primary hidden" id="toDay6" onclick="go('gate5')">Day 5 の記録を閉じる</button>
+  <div id="post-day5" class="hidden">
+    <p>観測メモ：廃棄の申告があった🥦が、同じ位置にあります。</p>
+    <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
+    <div class="choices">
+      <button onclick="answerCheck(3,false,this)">異常なしとして処理する</button>
+      <button onclick="answerCheck(3,true,this)">齟齬として報告する</button>
+    </div>
+    <p class="reaction" id="check3Msg"></p>
+    <div class="choices">
+      <button class="primary hidden" id="toDay6" onclick="go('gate5')">Day 5 の記録を閉じる</button>
+    </div>
   </div>
 </section>
 
@@ -339,17 +407,27 @@
 <!-- Day6：齟齬3 -->
 <section id="day6">
   <p class="ts">DAY 6 ― 25:13　観測（時刻の記録に異常）</p>
-  <div class="log">
-    <p class="q">観測者：初日に、卵は3個でした。</p>
-    <p class="a">K：「卵？ 最初から、6個ですよ」</p>
+  <div class="doc">
+    <p class="dlabel">【資料】本人の証言</p>
+    <p>観測者：初日に、卵は3個でした。<br>K：「卵？ 最初から、6個ですよ」</p>
+    <p>再掲 ― Day 1の記録：🥚は3個。K「卵は、常にあります」</p>
   </div>
-  <p id="day6food"></p>
-  <div class="log">
-    <p class="ts">再掲 ― Day1の記録：🥚は3個。K「卵は、常にあります」</p>
-    <p>記録と、証言が、食い違っている。……この件の所見は、求められていない。</p>
+  <div class="fridgebox">
+    <button class="primary" id="open-day6" onclick="openFridge('day6')">冷蔵庫を開ける</button>
+    <div id="g-day6" class="hidden"><div class="grid">
+    <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍇</div>
+  </div></div>
+    <p class="small hidden" id="closed-day6">（冷蔵庫は、閉じられました）</p>
+    <button class="hidden" id="close-day6" onclick="closeFridge('day6','post-day6')">冷蔵庫を閉じる</button>
   </div>
-  <div class="choices">
-    <button class="primary" onclick="go('gate6')">Day 6 の記録を閉じる</button>
+  <div id="post-day6" class="hidden">
+    <p id="day6food"></p>
+    <p>観測メモ：記録と、証言が、食い違っています。……この件の所見は、求められていません。</p>
+    <div class="choices">
+      <button class="primary" onclick="go('gate6')">Day 6 の記録を閉じる</button>
+    </div>
   </div>
 </section>
 
@@ -366,22 +444,31 @@
 <!-- Day7 -->
 <section id="day7">
   <p class="ts">DAY 7 ― 10:00　最終観測</p>
-  <p>冷蔵庫は、片付いていた。</p>
-  <div class="grid">
+  <div class="doc">
+    <p class="dlabel">【資料】廃棄記録（観測期間中）</p>
+    <div id="wasteLog">
+      <p>🥚 ×3（6個のうち3個が、期限切れ）</p>
+      <p id="wasteFood">余らせた食材 ×1</p>
+      <p>🥦 ×1（捨てたつもりで残っていたもの。最終日に廃棄）</p>
+      <p>🍇 ×1（出所の記録がないまま、期限切れ）</p>
+      <p>合計：約 🪙×4（約400円）　※🪙＝100円として換算</p>
+    </div>
+  </div>
+  <p>冷蔵庫は、片付いていました。</p>
+  <div class="fridgebox">
+    <button class="primary" id="open-day7" onclick="openFridge('day7')">冷蔵庫を開ける</button>
+    <div id="g-day7" class="hidden"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕</div><div>（空）</div><div>🍅</div>
     <div>（空）</div><div>（空）</div><div>（空）</div>
+  </div></div>
+    <p class="small hidden" id="closed-day7">（冷蔵庫は、閉じられました）</p>
+    <button class="hidden" id="close-day7" onclick="closeFridge('day7','post-day7')">冷蔵庫を閉じる</button>
   </div>
-  <p>観測期間中の廃棄物を、記録する。（🪙＝100円として換算）</p>
-  <div class="log" id="wasteLog">
-    <p>🥚 ×3（6個のうち3個が、期限切れ）</p>
-    <p id="wasteFood">余らせた食材 ×1</p>
-    <p>🥦 ×1（捨てたつもりで残っていたもの。最終日に廃棄）</p>
-    <p>🍇 ×1（出所の記録がないまま、期限切れ）</p>
-    <p>合計：約 🪙×4（約400円）</p>
-  </div>
-  <div class="choices">
-    <button class="primary" onclick="showEnding()">観測を、終える</button>
+  <div id="post-day7" class="hidden">
+    <div class="choices">
+      <button class="primary" onclick="showEnding()">観測を、終える</button>
+    </div>
   </div>
 </section>
 
@@ -479,8 +566,8 @@ function confirmFood() {
   const picked = document.querySelector('#palette button.picked');
   state.foodPicked = !!picked;
   if (!picked) state.food = '🍌';
-  document.getElementById('day4food').textContent =
-    'ドアポケット：' + state.food + state.food + '（前日は1つ）。増加の記録はない。';
+  document.getElementById('day4receipt').textContent =
+    state.food + ' ×2（ドアポケット分。前日は1つ）';
   document.getElementById('day6food').textContent =
     state.food + ' は、傷み始めていた。記録には「まだ食べられる」とある。';
   document.getElementById('wasteFood').textContent = state.food + ' ×1（増えた分の1つが、期限切れ）';
@@ -494,6 +581,23 @@ function advance(target, eraseId) {
     if (el) el.innerHTML = '<p class="small">（この記録は照合済みです。再表示はされません）</p>';
   }
   go(target);
+}
+
+/* 冷蔵庫の開閉 */
+function openFridge(n) {
+  document.getElementById('open-' + n).classList.add('hidden');
+  document.getElementById('g-' + n).classList.remove('hidden');
+  document.getElementById('close-' + n).classList.remove('hidden');
+}
+function closeFridge(n, postId) {
+  document.getElementById('g-' + n).classList.add('hidden');
+  document.getElementById('close-' + n).classList.add('hidden');
+  document.getElementById('closed-' + n).classList.remove('hidden');
+  const post = document.getElementById(postId);
+  if (post) {
+    post.classList.remove('hidden');
+    post.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
 /* 練習 */
