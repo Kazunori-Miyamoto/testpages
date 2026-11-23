@@ -86,7 +86,7 @@
   .doc.receipt-doc { background: #f7f5ef; color: #222; font-family: ui-monospace, Menlo, monospace; border: none; }
   .doc.receipt-doc .dlabel { color: #666; }
   .fridgebox { display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(92vw, 480px); }
-  .corridor { min-height: 230svh; justify-content: flex-start; padding-top: 16svh; gap: 55svh; }
+  .corridor { min-height: 460svh; justify-content: flex-start; padding-top: 16svh; gap: 110svh; }
   .glimpse { opacity: .38; filter: blur(1.2px); }
   .stamp {
     display: inline-block; border: 2px solid currentColor; border-radius: 4px;
@@ -95,6 +95,20 @@
   }
   .stamp-red { color: #e06666; }
   .stamp-gray { color: #888; }
+  .paper .cover-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; padding: 6px 0; border-bottom: 1px dotted #aaa; text-align: left;
+  }
+  .paper .cover-row .mini-stamp {
+    border: 2px solid currentColor; border-radius: 4px; padding: 1px 8px;
+    font-size: 12px; transform: rotate(-3deg); white-space: nowrap;
+    font-family: ui-monospace, Menlo, monospace;
+  }
+  .paper .big-stamp {
+    display: inline-block; margin-top: 16px; border: 3px solid currentColor; border-radius: 6px;
+    padding: 6px 22px; font-size: 24px; font-weight: 700; letter-spacing: .3em;
+    transform: rotate(-6deg); font-family: ui-monospace, Menlo, monospace;
+  }
 </style>
 </head>
 <body>
@@ -104,7 +118,7 @@
   <p class="ts"><span class="rec">● REC</span>　ARCHIVE No. K-07</p>
   <h1>観測記録K</h1>
   <p>被験者Kの冷蔵庫 ― 定点観測記録</p>
-  <p class="big">誰もいないのに、増えている。</p>
+  <p style="font-size:19px; letter-spacing:.14em;">誰もいないのに、増えている。</p>
   <div class="log">
     <p>観測機関：生活記録観測所</p>
     <p>目的：一人暮らしの食料保管の実態を、記録すること。</p>
@@ -428,15 +442,18 @@
     <p class="dlabel">【資料】廃棄記録（観測期間中）</p>
     <div id="wasteLog">
       <p>🥚 ×3（6個のうち3個が、期限切れ）</p>
-      <p class="small">🥚「まだ3つ残っていたのに、特売で、もう1パック買われました。古い方から、期限が切れました」</p>
       <p id="wasteFood">余らせた食材 ×1</p>
-      <p class="small" id="wasteFoodVoice"></p>
       <p>🥦 ×1（捨てたつもりで残っていたもの。最終日に廃棄）</p>
-      <p class="small">🥦「少し状態が悪くなったので、捨てられたと思っていました。――捨てられていませんでした」</p>
       <p>🍇 ×1（出所の記録がないまま、期限切れ）</p>
       <p>合計：約 🪙×4（約400円）　※🪙＝100円として換算</p>
       <p>特売で浮いた分：約80円／捨てた分：約400円 ― 差し引き、損をしています</p>
     </div>
+  </div>
+  <div class="doc">
+    <p class="dlabel">【資料2】当事者の記録（食材）</p>
+    <p>🥚「まだ3つ残っていたのに、特売で、もう1パック買われました。古い方から、期限が切れました」</p>
+    <p>🥦「少し状態が悪くなったので、捨てられたと思っていました。――捨てられていませんでした」</p>
+    <p id="wasteFoodVoice"></p>
   </div>
   <p>冷蔵庫は、片付いていました。</p>
   <div class="fridgebox">
@@ -473,22 +490,15 @@
   <p class="small">結果画像は保存してシェアいただけます。</p>
   <div class="paper" id="resultPaper">
     <p class="psub">生活記録観測所</p>
-    <p class="ptitle">冷蔵庫観測に関するテスト</p>
-    <p class="psub">観測結果</p>
+    <p class="ptitle">観測記録ファイル ― 表紙</p>
+    <p class="psub">ARCHIVE No. K-07 ／ 被験者Kの冷蔵庫 ／ 観測期間：7日間</p>
     <hr>
-    <p class="score">指摘　<span id="rScore">―</span>／三</p>
-    <p class="score">観測適性　<span id="rFit">―</span></p>
-    <hr>
-    <table>
-      <tr><td>練習記録</td><td class="dots" id="rPractice">―</td></tr>
-      <tr><td>第一齟齬（🍇）</td><td class="dots" id="rD1">―</td></tr>
-      <tr><td>第二齟齬（🥚）</td><td class="dots" id="rD2">―</td></tr>
-      <tr><td>第三齟齬（🥦）</td><td class="dots" id="rD3">―</td></tr>
-      <tr><td>参考（証言の矛盾）</td><td class="dots">○</td></tr>
-    </table>
-    <hr>
-    <p class="psub">◉ 観測に同意します</p>
-    <p class="sign">観測者　あなた</p>
+    <div class="cover-row"><span>練習記録 ― 記録0</span><span class="mini-stamp" id="rPractice">―</span></div>
+    <div class="cover-row"><span>DAY 3 ― 🍇の出現</span><span class="mini-stamp" id="rD1">―</span></div>
+    <div class="cover-row"><span>DAY 4 ― 🥚の増加</span><span class="mini-stamp" id="rD2">―</span></div>
+    <div class="cover-row"><span>DAY 5 ― 🥦の回帰</span><span class="mini-stamp" id="rD3">―</span></div>
+    <div class="cover-row"><span>DAY 6 ― 証言の矛盾</span><span class="mini-stamp stamp-gray">所見対象外</span></div>
+    <p><span class="big-stamp" id="rBigStamp">―</span></p>
     <p class="psub" id="rDate"></p>
     <p class="psub">超常現象は、ない。あるのは、冷蔵庫と、嘘をつく記憶だけ</p>
   </div>
@@ -597,8 +607,8 @@ function openFridge(n) {
     if (n === 'day6') {
       soundNodes.g.gain.linearRampToValueAtTime(0.02, actx.currentTime + 0.15);
       setTimeout(() => {
-        if (soundNodes && soundNodes.g.gain.value < 0.1) {
-          soundNodes.g.gain.linearRampToValueAtTime(0.2, actx.currentTime + 0.5);
+        if (soundNodes && soundNodes.g.gain.value < 0.25) {
+          soundNodes.g.gain.linearRampToValueAtTime(0.5, actx.currentTime + 0.5);
         }
       }, 1300);
     }
@@ -642,7 +652,7 @@ function toggleSound() {
     actx = new AC();
     const g = actx.createGain(); g.gain.value = 0.0; g.connect(actx.destination);
     const o1 = actx.createOscillator(); o1.type = 'sine'; o1.frequency.value = 55;
-    const og1 = actx.createGain(); og1.gain.value = 0.7; o1.connect(og1); og1.connect(g);
+    const og1 = actx.createGain(); og1.gain.value = 1.0; o1.connect(og1); og1.connect(g);
     const o2 = actx.createOscillator(); o2.type = 'sine'; o2.frequency.value = 110;
     const og2 = actx.createGain(); og2.gain.value = 0.12; o2.connect(og2); og2.connect(g);
     const len = actx.sampleRate * 2;
@@ -651,7 +661,7 @@ function toggleSound() {
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     const noise = actx.createBufferSource(); noise.buffer = buf; noise.loop = true;
     const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 320;
-    const ng = actx.createGain(); ng.gain.value = 0.1;
+    const ng = actx.createGain(); ng.gain.value = 0.2;
     noise.connect(f); f.connect(ng); ng.connect(g);
     o1.start(); o2.start(); noise.start();
     soundNodes = { g, o1 };
@@ -661,7 +671,7 @@ function toggleSound() {
     btn.textContent = '🔇 音：オフ';
   } else {
     actx.resume();
-    soundNodes.g.gain.linearRampToValueAtTime(0.2, actx.currentTime + 0.6);
+    soundNodes.g.gain.linearRampToValueAtTime(0.5, actx.currentTime + 0.6);
     btn.textContent = '🔊 音：オン';
   }
 }
@@ -728,20 +738,25 @@ function showEnding() {
       '<p>封印前に、1枚だけ差し込まれていた。被験者K ― 登録票（抜粋）：買い物パターンの出典 …… 観測者の回答（' + state.food + '）</p>';
     line.textContent = '……ただ、最後の1行が、追加されています。';
   }
-  const KANJI = ['零', '一', '二', '三'];
-  document.getElementById('rScore').textContent = KANJI[state.score];
-  document.getElementById('rFit').textContent = state.score === 3 ? '良' : state.score === 2 ? '可' : '要再観測';
-  document.getElementById('rPractice').textContent = state.practiceOk ? '●' : '○';
-  document.getElementById('rD1').textContent = state.noticed[1] ? '●' : '○';
-  document.getElementById('rD2').textContent = state.noticed[2] ? '●' : '○';
-  document.getElementById('rD3').textContent = state.noticed[3] ? '●' : '○';
+  const setStamp = (id, on) => {
+    const el = document.getElementById(id);
+    el.textContent = on ? '報告済み' : '未照合';
+    el.style.color = on ? '#b03a3a' : '#888';
+  };
+  setStamp('rPractice', state.practiceOk);
+  setStamp('rD1', !!state.noticed[1]);
+  setStamp('rD2', !!state.noticed[2]);
+  setStamp('rD3', !!state.noticed[3]);
+  const bs = document.getElementById('rBigStamp');
+  bs.textContent = state.score === 3 ? '観測完了' : state.score === 0 ? '封印' : '観測継続';
+  bs.style.color = state.score === 0 ? '#555' : '#b03a3a';
   const rd = new Date();
   document.getElementById('rDate').textContent = 'ARCHIVE No. K-07 ／ ' + rd.getFullYear() + '.' + (rd.getMonth() + 1) + '.' + rd.getDate();
   document.getElementById('resultTotal').textContent =
-    '見抜けた齟齬：' + state.score + ' / 3' +
-    (state.score === 3 ? ' ― 全部、見抜けました。原因は、すべて本人の忘却でした。'
-      : state.score === 0 ? ' ― 全部、記録に流されました。原因は、すべて本人の忘却でした。'
-      : ' ― 見抜けたものと、流されたものがありました。原因は、すべて本人の忘却でした。');
+    '押された所見スタンプ：' + state.score + ' / 3' +
+    (state.score === 3 ? ' ― 全部の記録に、あなたの所見が残りました。'
+      : state.score === 0 ? ' ― どの記録にも、所見は残りませんでした。'
+      : ' ― 所見が残った記録と、未照合のままの記録があります。');
   const h = load(KEY) || { plays: 0 };
   save(KEY, {
     plays: (h.plays || 0) + 1,
@@ -753,31 +768,39 @@ function showEnding() {
 function saveResultImage() {
   const cv = document.getElementById('resultCanvas');
   const ctx = cv.getContext('2d');
-  const KANJI = ['零', '一', '二', '三'];
   ctx.fillStyle = '#f7f5ef'; ctx.fillRect(0, 0, cv.width, cv.height);
   ctx.strokeStyle = '#999'; ctx.lineWidth = 2; ctx.strokeRect(28, 28, cv.width - 56, cv.height - 56);
   ctx.fillStyle = '#1a1a1a'; ctx.textAlign = 'center';
   ctx.font = '26px serif'; ctx.fillText('生活記録観測所', 440, 110);
-  ctx.font = '700 42px serif'; ctx.fillText('冷蔵庫観測に関するテスト', 440, 180);
-  ctx.font = '26px serif'; ctx.fillText('観測結果', 440, 235);
-  ctx.font = '36px serif';
-  ctx.fillText('指摘　' + KANJI[state.score] + '／三', 440, 340);
-  ctx.fillText('観測適性　' + (state.score === 3 ? '良' : state.score === 2 ? '可' : '要再観測'), 440, 410);
+  ctx.font = '700 40px serif'; ctx.fillText('観測記録ファイル ― 表紙', 440, 180);
+  ctx.font = '24px serif'; ctx.fillText('ARCHIVE No. K-07 ／ 被験者Kの冷蔵庫 ／ 観測期間：7日間', 440, 235);
   ctx.font = '30px serif'; ctx.textAlign = 'left';
   const rows = [
-    ['練習記録', state.practiceOk ? '●' : '○'],
-    ['第一齟齬（🍇）', state.noticed[1] ? '●' : '○'],
-    ['第二齟齬（🥚）', state.noticed[2] ? '●' : '○'],
-    ['第三齟齬（🥦）', state.noticed[3] ? '●' : '○'],
-    ['参考（証言の矛盾）', '○']
+    ['練習記録 ― 記録0', state.practiceOk],
+    ['DAY 3 ― 🍇の出現', !!state.noticed[1]],
+    ['DAY 4 ― 🥚の増加', !!state.noticed[2]],
+    ['DAY 5 ― 🥦の回帰', !!state.noticed[3]]
   ];
   rows.forEach((r, i) => {
-    ctx.fillText(r[0], 150, 520 + i * 64);
-    ctx.textAlign = 'right'; ctx.fillText(r[1], 730, 520 + i * 64); ctx.textAlign = 'left';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText(r[0], 130, 380 + i * 80);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = r[1] ? '#b03a3a' : '#888';
+    ctx.fillText(r[1] ? '報告済み' : '未照合', 750, 380 + i * 80);
+    ctx.textAlign = 'left';
   });
-  ctx.textAlign = 'center'; ctx.font = '28px serif';
-  ctx.fillText('◉ 観測に同意します', 440, 900);
-  ctx.font = '34px serif'; ctx.fillText('観測者　あなた', 440, 955);
+  ctx.save();
+  ctx.translate(440, 800); ctx.rotate(-0.1);
+  ctx.strokeStyle = state.score === 0 ? '#555' : '#b03a3a'; ctx.lineWidth = 4;
+  const label = state.score === 3 ? '観測完了' : state.score === 0 ? '封印' : '観測継続';
+  ctx.font = '700 54px sans-serif';
+  const w = ctx.measureText(label).width + 70;
+  ctx.strokeRect(-w / 2, -52, w, 96);
+  ctx.fillStyle = ctx.strokeStyle; ctx.textAlign = 'center';
+  ctx.fillText(label, 0, 20);
+  ctx.restore();
+  ctx.fillStyle = '#666'; ctx.font = '22px serif'; ctx.textAlign = 'center';
+  ctx.fillText('超常現象は、ない。あるのは、冷蔵庫と、嘘をつく記憶だけ', 440, 960);
   const a = document.createElement('a');
   a.download = 'kansoku-result.png';
   a.href = cv.toDataURL('image/png');
