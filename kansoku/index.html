@@ -64,6 +64,20 @@
   }
   .hidden { display: none !important; }
   .big { font-size: 34px; }
+  .paper {
+    background: #f7f5ef; color: #1a1a1a; width: min(92vw, 440px);
+    padding: 30px 26px; border-radius: 2px; text-align: center;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    box-shadow: 0 8px 40px rgba(0,0,0,.6); line-height: 1.9;
+  }
+  .paper .ptitle { font-size: 21px; font-weight: 700; letter-spacing: .12em; }
+  .paper .psub { font-size: 13px; color: #555; }
+  .paper hr { border: none; border-top: 1px solid #999; margin: 12px 0; }
+  .paper .score { font-size: 19px; letter-spacing: .2em; }
+  .paper table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .paper td { padding: 4px 2px; text-align: left; }
+  .paper td.dots { text-align: right; letter-spacing: .25em; }
+  .paper .sign { font-size: 18px; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -156,7 +170,17 @@
     <p class="a">K：「卵は、常にあります。切らしたこと、ないですね」</p>
   </div>
   <div class="choices">
-    <button class="primary" onclick="advance('day2','g-day1')">Day 2 へ</button>
+    <button class="primary" onclick="go('gate1')">Day 1 の記録を閉じる</button>
+  </div>
+</section>
+
+
+<section id="gate1">
+  <p class="ts">― 記録を閉じます ―</p>
+  <p>ここでは、スクロールしないでください。</p>
+  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
+  <div class="choices">
+    <button class="primary" onclick="advance('day2','g-day1')">Day 2 を開く</button>
   </div>
 </section>
 
@@ -172,10 +196,20 @@
   </div></div>
   <p>購入品のうち🍞🧻🍙は、冷蔵庫の外で保管されるものとして記録されている。<br>🥩と🥛1本の減少は、Kの食事記録と一致。異常なし。</p>
   <div class="choices">
-    <button class="primary" onclick="advance('n1','g-day2')">Day 3 へ</button>
+    <button class="primary" onclick="go('gate2')">Day 2 の記録を閉じる</button>
   </div>
 </section>
 
+
+
+<section id="gate2">
+  <p class="ts">― 記録を閉じます ―</p>
+  <p>ここでは、スクロールしないでください。</p>
+  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
+  <div class="choices">
+    <button class="primary" onclick="advance('n1','g-day2')">Day 3 を開く</button>
+  </div>
+</section>
 
 <!-- ノイズ1：他被験者の記録 -->
 <section id="n1">
@@ -208,7 +242,17 @@
   </div>
   <p class="reaction" id="check1Msg"></p>
   <div class="choices">
-    <button class="primary hidden" id="toDay4" onclick="advance('day4','g-day3')">Day 4 へ</button>
+    <button class="primary hidden" id="toDay4" onclick="go('gate3')">Day 3 の記録を閉じる</button>
+  </div>
+</section>
+
+
+<section id="gate3">
+  <p class="ts">― 記録を閉じます ―</p>
+  <p>ここでは、スクロールしないでください。</p>
+  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
+  <div class="choices">
+    <button class="primary" onclick="advance('day4','g-day3')">Day 4 を開く</button>
   </div>
 </section>
 
@@ -233,7 +277,17 @@
   </div>
   <p class="reaction" id="check2Msg"></p>
   <div class="choices">
-    <button class="primary hidden" id="toDay5" onclick="advance('day5','g-day4')">Day 5 へ</button>
+    <button class="primary hidden" id="toDay5" onclick="go('gate4')">Day 4 の記録を閉じる</button>
+  </div>
+</section>
+
+
+<section id="gate4">
+  <p class="ts">― 記録を閉じます ―</p>
+  <p>ここでは、スクロールしないでください。</p>
+  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
+  <div class="choices">
+    <button class="primary" onclick="advance('day5','g-day4')">Day 5 を開く</button>
   </div>
 </section>
 
@@ -253,10 +307,20 @@
   </div>
   <p class="reaction" id="check3Msg"></p>
   <div class="choices">
-    <button class="primary hidden" id="toDay6" onclick="advance('n2','g-day5')">Day 6 へ</button>
+    <button class="primary hidden" id="toDay6" onclick="go('gate5')">Day 5 の記録を閉じる</button>
   </div>
 </section>
 
+
+
+<section id="gate5">
+  <p class="ts">― 記録を閉じます ―</p>
+  <p>ここでは、スクロールしないでください。</p>
+  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
+  <div class="choices">
+    <button class="primary" onclick="advance('n2','g-day5')">Day 6 を開く</button>
+  </div>
+</section>
 
 <!-- ノイズ2：研究所からの通知 -->
 <section id="n2">
@@ -285,7 +349,17 @@
     <p>記録と、証言が、食い違っている。……この件の所見は、求められていない。</p>
   </div>
   <div class="choices">
-    <button class="primary" onclick="go('day7')">Day 7 へ</button>
+    <button class="primary" onclick="go('gate6')">Day 6 の記録を閉じる</button>
+  </div>
+</section>
+
+
+<section id="gate6">
+  <p class="ts">― 記録を閉じます ―</p>
+  <p>ここでは、スクロールしないでください。</p>
+  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
+  <div class="choices">
+    <button class="primary" onclick="go('day7')">Day 7 を開く</button>
   </div>
 </section>
 
@@ -324,13 +398,34 @@
 
 <!-- リザルト -->
 <section id="s-result">
-  <p class="ts">OBSERVATION RESULT</p>
-  <h2>あなたの観測結果</h2>
-  <div class="log" id="resultLog"></div>
+  <p>観測が完了しました。<br>ご協力ありがとうございました。</p>
+  <p class="small">結果画像は保存してシェアいただけます。</p>
+  <div class="paper" id="resultPaper">
+    <p class="psub">生活記録観測所</p>
+    <p class="ptitle">冷蔵庫観測に関するテスト</p>
+    <p class="psub">観測結果</p>
+    <hr>
+    <p class="score">指摘　<span id="rScore">―</span>／三</p>
+    <p class="score">観測適性　<span id="rFit">―</span></p>
+    <hr>
+    <table>
+      <tr><td>練習記録</td><td class="dots" id="rPractice">―</td></tr>
+      <tr><td>第一齟齬（🍇）</td><td class="dots" id="rD1">―</td></tr>
+      <tr><td>第二齟齬（🥚）</td><td class="dots" id="rD2">―</td></tr>
+      <tr><td>第三齟齬（🥦）</td><td class="dots" id="rD3">―</td></tr>
+      <tr><td>参考（証言の矛盾）</td><td class="dots">○</td></tr>
+    </table>
+    <hr>
+    <p class="psub">◉ 観測に同意します</p>
+    <p class="sign">観測者　あなた</p>
+    <p class="psub" id="rDate"></p>
+  </div>
   <p id="resultTotal"></p>
   <div class="choices">
-    <button class="primary" onclick="go('s-final')">最後の記録へ</button>
+    <button class="primary" onclick="saveResultImage()">結果画像を保存する</button>
+    <button onclick="go('s-final')">最後の記録へ</button>
   </div>
+  <canvas id="resultCanvas" width="880" height="1040" class="hidden"></canvas>
 </section>
 
 <!-- 最後の記録 -->
@@ -349,7 +444,7 @@
 
 <script>
 const KEY = 'kansoku_v1';
-const state = { food: '🍌', foodPicked: false, noticed: {}, score: 0 };
+const state = { food: '🍌', foodPicked: false, noticed: {}, score: 0, practiceOk: false };
 const CHECK_NAMES = { 1: '🍇の出現', 2: '🥚の増加', 3: '捨てたはずの🥦' };
 
 function load(key) { try { return JSON.parse(localStorage.getItem(key)) || null; } catch (e) { return null; } }
@@ -404,6 +499,7 @@ function advance(target, eraseId) {
 /* 練習 */
 function showPractice2() { go('s-practice2'); }
 function answerPractice(ok, btn) {
+  state.practiceOk = ok;
   btn.closest('.choices').querySelectorAll('button').forEach(b => { b.disabled = true; });
   btn.classList.add('picked'); btn.disabled = false;
   document.getElementById('practiceMsg').innerHTML = ok
@@ -500,13 +596,20 @@ function showEnding() {
       '<p>記録は、封印される。</p>';
     line.textContent = '……ただ、最後の1行が、追加されています。';
   }
-  const rows = [1, 2, 3].map(n =>
-    '<p>' + CHECK_NAMES[n] + '：' + (state.noticed[n] ? '見抜けました' : '見抜けませんでした') + '（原因：本人の忘却）</p>').join('');
-  document.getElementById('resultLog').innerHTML = rows +
-    '<p>Kの証言の矛盾：所見を求められなかった項目（本人の記憶が、書き換わっていました）</p>';
+  const KANJI = ['零', '一', '二', '三'];
+  document.getElementById('rScore').textContent = KANJI[state.score];
+  document.getElementById('rFit').textContent = state.score === 3 ? '良' : state.score === 2 ? '可' : '要再観測';
+  document.getElementById('rPractice').textContent = state.practiceOk ? '●' : '○';
+  document.getElementById('rD1').textContent = state.noticed[1] ? '●' : '○';
+  document.getElementById('rD2').textContent = state.noticed[2] ? '●' : '○';
+  document.getElementById('rD3').textContent = state.noticed[3] ? '●' : '○';
+  const rd = new Date();
+  document.getElementById('rDate').textContent = 'ARCHIVE No. K-07 ／ ' + rd.getFullYear() + '.' + (rd.getMonth() + 1) + '.' + rd.getDate();
   document.getElementById('resultTotal').textContent =
     '見抜けた齟齬：' + state.score + ' / 3' +
-    (state.score === 3 ? ' ― 全部、見抜けました。' : state.score === 0 ? ' ― 全部、記録に流されました。' : ' ― 見抜けたものと、流されたものがありました。');
+    (state.score === 3 ? ' ― 全部、見抜けました。原因は、すべて本人の忘却でした。'
+      : state.score === 0 ? ' ― 全部、記録に流されました。原因は、すべて本人の忘却でした。'
+      : ' ― 見抜けたものと、流されたものがありました。原因は、すべて本人の忘却でした。');
   const h = load(KEY) || { plays: 0 };
   save(KEY, {
     plays: (h.plays || 0) + 1,
@@ -514,6 +617,39 @@ function showEnding() {
     food: state.food, score: state.score
   });
   go('s-ending');
+}
+function saveResultImage() {
+  const cv = document.getElementById('resultCanvas');
+  const ctx = cv.getContext('2d');
+  const KANJI = ['零', '一', '二', '三'];
+  ctx.fillStyle = '#f7f5ef'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.strokeStyle = '#999'; ctx.lineWidth = 2; ctx.strokeRect(28, 28, cv.width - 56, cv.height - 56);
+  ctx.fillStyle = '#1a1a1a'; ctx.textAlign = 'center';
+  ctx.font = '26px serif'; ctx.fillText('生活記録観測所', 440, 110);
+  ctx.font = '700 42px serif'; ctx.fillText('冷蔵庫観測に関するテスト', 440, 180);
+  ctx.font = '26px serif'; ctx.fillText('観測結果', 440, 235);
+  ctx.font = '36px serif';
+  ctx.fillText('指摘　' + KANJI[state.score] + '／三', 440, 340);
+  ctx.fillText('観測適性　' + (state.score === 3 ? '良' : state.score === 2 ? '可' : '要再観測'), 440, 410);
+  ctx.font = '30px serif'; ctx.textAlign = 'left';
+  const rows = [
+    ['練習記録', state.practiceOk ? '●' : '○'],
+    ['第一齟齬（🍇）', state.noticed[1] ? '●' : '○'],
+    ['第二齟齬（🥚）', state.noticed[2] ? '●' : '○'],
+    ['第三齟齬（🥦）', state.noticed[3] ? '●' : '○'],
+    ['参考（証言の矛盾）', '○']
+  ];
+  rows.forEach((r, i) => {
+    ctx.fillText(r[0], 150, 520 + i * 64);
+    ctx.textAlign = 'right'; ctx.fillText(r[1], 730, 520 + i * 64); ctx.textAlign = 'left';
+  });
+  ctx.textAlign = 'center'; ctx.font = '28px serif';
+  ctx.fillText('◉ 観測に同意します', 440, 900);
+  ctx.font = '34px serif'; ctx.fillText('観測者　あなた', 440, 955);
+  const a = document.createElement('a');
+  a.download = 'kansoku-result.png';
+  a.href = cv.toDataURL('image/png');
+  a.click();
 }
 function shareRecord() {
   const text = '観測記録K｜被験者Kの冷蔵庫を、1週間観測した記録。';
