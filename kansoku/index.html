@@ -64,9 +64,14 @@
   }
   .hidden { display: none !important; }
   .big { font-size: 34px; }
+  #soundBtn {
+    position: fixed; top: 12px; right: 12px; z-index: 60; width: auto;
+    padding: 8px 14px; font-size: 14px; background: rgba(10,10,10,.85);
+  }
 </style>
 </head>
 <body>
+<button id="soundBtn" onclick="toggleSound()">🔇 音：オフ</button>
 
 <!-- 0. 研究所トップ -->
 <section id="s0">
@@ -79,12 +84,46 @@
     <p>方法：冷蔵庫内を定点観測し、購入記録・廃棄記録・本人の証言と照合する。</p>
     <p>被験者K：大学2年、一人暮らし。本人の同意のもと、氏名は伏せて公開する。</p>
   </div>
-  <p class="small">※この記録は、あなたの端末内にだけ保存されます。外部に送信されることはありません。</p>
+  <p class="small">※この記録は、あなたの端末内にだけ保存されます。外部に送信されることはありません。<br>※右上のボタンで、観測室の環境音を出せます（任意）。</p>
   <div id="revisit" class="hidden">
     <p id="revisitText"></p>
   </div>
   <div class="choices">
-    <button class="primary" onclick="go('s1')">記録を開く</button>
+    <button class="primary" onclick="go('s-practice')">まず、練習記録を開く</button>
+  </div>
+</section>
+
+
+<!-- 練習記録（記録0） -->
+<section id="s-practice">
+  <p class="ts">記録0 ― 練習（本番ではありません）</p>
+  <h2>観測者の仕事は、1つだけです。</h2>
+  <p>「記録」と「実物」のズレを見つけること。<br>まず、練習でやってみます。</p>
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr); width: min(92vw, 300px);">
+    <div>🥛</div><div>🍎</div>
+    <div>🧀</div><div>（空）</div>
+  </div>
+  <p class="small">練習用冷蔵庫（1日目）。購入記録：この日、買ったのは🥛だけです。</p>
+  <div class="choices">
+    <button class="primary" onclick="showPractice2()">2日目を見る</button>
+  </div>
+</section>
+
+<section id="s-practice2">
+  <p class="ts">記録0 ― 2日目</p>
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr); width: min(92vw, 300px);">
+    <div>🥛</div><div>🍎</div>
+    <div>🧀</div><div>🍇</div>
+  </div>
+  <p>購入記録：2日目も、買ったのは🥛だけです。</p>
+  <p><strong>問い：記録と実物に、ズレはありますか？</strong></p>
+  <div class="choices">
+    <button onclick="answerPractice(true,this)">ある。🍇は、買っていない</button>
+    <button onclick="answerPractice(false,this)">ない</button>
+  </div>
+  <p class="reaction" id="practiceMsg"></p>
+  <div class="choices">
+    <button class="primary hidden" id="toPrecheck" onclick="go('s1')">分かった。本番の記録へ</button>
   </div>
 </section>
 
@@ -102,9 +141,9 @@
     <button data-food="🍅" aria-label="トマト">🍅</button>
   </div>
   <p id="pickedMsg" class="small"></p>
+  <p class="small">選ばなくても、進めます。</p>
   <div class="choices">
-    <button class="primary" onclick="confirmFood()">照合を終える</button>
-    <button class="plain" onclick="confirmFood(true)">答えずに進む</button>
+    <button class="primary" onclick="confirmFood()">本番の記録へ進む</button>
   </div>
 </section>
 
@@ -135,7 +174,7 @@
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍐</div>
   </div>
-  <p>消費による減少を確認。異常なし。</p>
+  <p>購入品のうち🍞🧻🍙は、冷蔵庫の外で保管されるものとして記録されている。<br>🥩と🥛1本の減少は、Kの食事記録と一致。異常なし。</p>
   <div class="choices">
     <button class="primary" onclick="go('day3')">Day 3 へ</button>
   </div>
@@ -147,13 +186,13 @@
   <div class="grid">
     <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
-    <div>🍌</div><div>（空）</div><div class="odd">🍇</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div>
-  <p>新規物品を確認。購入記録（🥫🥛）に、🍇はない。</p>
+  <p>変化を確認：🍐が1つ減り、🍇が1つ増えた。<br>この日の購入記録は「🥫と🥛」だけです。</p>
   <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
   <div class="choices">
-    <button onclick="answerCheck(1,false,this)">購入記録の漏れだろう</button>
-    <button onclick="answerCheck(1,true,this)">説明が、つかない</button>
+    <button onclick="answerCheck(1,false,this)">異常なしとして処理する</button>
+    <button onclick="answerCheck(1,true,this)">齟齬として報告する</button>
   </div>
   <p class="reaction" id="check1Msg"></p>
   <div class="choices">
@@ -165,9 +204,9 @@
 <section id="day4">
   <p class="ts">DAY 4 ― 20:17　観測</p>
   <div class="grid">
-    <div>🥛</div><div class="odd">🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
+    <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
-    <div>🍌</div><div>（空）</div><div>🍇</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div>
   <p id="day4food">ドアポケットの記録にも、変化があった。</p>
   <div class="log">
@@ -175,8 +214,14 @@
     <p class="a">K：「卵は買ってないです。……買った、かな？」</p>
     <p class="ts">同日 22:03　廃棄記録：🥦 を廃棄した、と申告あり。</p>
   </div>
+  <p><strong>観測者への確認：卵の増加を、どう所見しますか？</strong></p>
   <div class="choices">
-    <button class="primary" onclick="go('day5')">Day 5 へ</button>
+    <button onclick="answerCheck(2,false,this)">異常なしとして処理する</button>
+    <button onclick="answerCheck(2,true,this)">齟齬として報告する</button>
+  </div>
+  <p class="reaction" id="check2Msg"></p>
+  <div class="choices">
+    <button class="primary hidden" id="toDay5" onclick="go('day5')">Day 5 へ</button>
   </div>
 </section>
 
@@ -185,16 +230,16 @@
   <p class="ts">DAY 5 ― 08:11　観測</p>
   <div class="grid">
     <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
-    <div>🥕🥕</div><div class="odd">🥦</div><div>🍅🍅</div>
-    <div>🍌</div><div>（空）</div><div>🍇</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div>
   <p>昨日、廃棄の申告があった🥦が、同じ位置にある。</p>
   <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
   <div class="choices">
-    <button onclick="answerCheck(2,false,this)">申告の誤りだろう</button>
-    <button onclick="answerCheck(2,true,this)">説明が、つかない</button>
+    <button onclick="answerCheck(3,false,this)">異常なしとして処理する</button>
+    <button onclick="answerCheck(3,true,this)">齟齬として報告する</button>
   </div>
-  <p class="reaction" id="check2Msg"></p>
+  <p class="reaction" id="check3Msg"></p>
   <div class="choices">
     <button class="primary hidden" id="toDay6" onclick="go('day6')">Day 6 へ</button>
   </div>
@@ -208,14 +253,12 @@
     <p class="a">K：「卵？ 最初から、6個ですよ」</p>
   </div>
   <p id="day6food"></p>
-  <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
-  <div class="choices">
-    <button onclick="answerCheck(3,false,this)">記録の誤りだろう</button>
-    <button onclick="answerCheck(3,true,this)">Kの記憶が、記録と食い違っている</button>
+  <div class="log">
+    <p class="ts">再掲 ― Day1の記録：🥚は3個。K「卵は、常にあります」</p>
+    <p>記録と、証言が、食い違っている。……この件の所見は、求められていない。</p>
   </div>
-  <p class="reaction" id="check3Msg"></p>
   <div class="choices">
-    <button class="primary hidden" id="toDay7" onclick="go('day7')">Day 7 へ</button>
+    <button class="primary" onclick="go('day7')">Day 7 へ</button>
   </div>
 </section>
 
@@ -223,11 +266,17 @@
 <section id="day7">
   <p class="ts">DAY 7 ― 10:00　最終観測</p>
   <p>冷蔵庫は、片付いていた。</p>
-  <p>観測期間中の廃棄物を、記録する。</p>
+  <div class="grid">
+    <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕</div><div>（空）</div><div>🍅</div>
+    <div>（空）</div><div>（空）</div><div>（空）</div>
+  </div>
+  <p>観測期間中の廃棄物を、記録する。（🪙＝100円として換算）</p>
   <div class="log" id="wasteLog">
-    <p>🥚 ×3（重複購入分）</p>
+    <p>🥚 ×3（6個のうち3個が、期限切れ）</p>
     <p id="wasteFood">余らせた食材 ×1</p>
-    <p>🥦 ×1（廃棄の申告と実態が一致しなかったもの）</p>
+    <p>🥦 ×1（捨てたつもりで残っていたもの。最終日に廃棄）</p>
+    <p>🍇 ×1（出所の記録がないまま、期限切れ）</p>
     <p>合計：約 🪙×4（約400円）</p>
   </div>
   <div class="choices">
@@ -249,7 +298,7 @@
 <!-- 最後の記録 -->
 <section id="s-final">
   <p class="ts" id="finalDate"></p>
-  <p id="finalLine">行動は、1つだけです。</p>
+  <p id="finalLine">記録と記憶がずれるのなら、記憶ではなく、記録を見る。<br>行動は、1つだけです。</p>
   <p class="big"><strong>買い物に行く前に、<br>冷蔵庫の写真を1枚撮る。</strong></p>
   <div class="choices">
     <button class="primary" onclick="shareRecord()">この記録をシェアする</button>
@@ -262,20 +311,22 @@
 
 <script>
 const KEY = 'kansoku_v1';
-const state = { food: '🍌', noticed: {}, score: 0 };
-const CHECK_NAMES = { 1: '🍇の出現', 2: '捨てたはずの🥦', 3: 'Kの証言の矛盾' };
+const state = { food: '🍌', foodPicked: false, noticed: {}, score: 0 };
+const CHECK_NAMES = { 1: '🍇の出現', 2: '🥚の増加', 3: '捨てたはずの🥦' };
 
 function load(key) { try { return JSON.parse(localStorage.getItem(key)) || null; } catch (e) { return null; } }
 function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
 function go(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
 
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
 /* 再訪（隠し結末Dの入口） */
 (function init() {
   const h = load(KEY);
   if (h && h.plays > 0) {
-    const missed = (h.missed && h.missed.length) ? h.missed.join('、') : 'なし';
-    document.getElementById('revisitText').innerHTML =
-      '前回の観測の、続きです。<br>前回、あなたが見落としたのは：' + missed + ' でした。';
+    document.getElementById('revisitText').innerHTML = (h.missed && h.missed.length)
+      ? '前回の観測の、続きです。<br>前回、あなたが見落としたのは：' + h.missed.join('、') + ' でした。<br>再観測として、同じ記録をもう一度開きます。'
+      : '前回の観測の、続きです。<br>前回、あなたは全部の齟齬に気づけました。……本当に、そうでしたか？';
     document.getElementById('revisit').classList.remove('hidden');
   }
   const d = new Date();
@@ -291,14 +342,63 @@ document.getElementById('palette').addEventListener('click', function (e) {
   state.food = b.dataset.food;
   document.getElementById('pickedMsg').textContent = '照合しました：' + state.food;
 });
-function confirmFood(skipped) {
-  if (skipped) state.food = '🍌';
+function confirmFood() {
+  const picked = document.querySelector('#palette button.picked');
+  state.foodPicked = !!picked;
+  if (!picked) state.food = '🍌';
   document.getElementById('day4food').textContent =
-    'ドアポケット：' + state.food + state.food + '（昨日は1つだった）。あなたが「余らせがち」と答えた食材が、Kの冷蔵庫でも増えている。';
+    'ドアポケット：' + state.food + state.food + '（前日は1つ）。増加の記録はない。';
   document.getElementById('day6food').textContent =
     state.food + ' は、傷み始めていた。記録には「まだ食べられる」とある。';
-  document.getElementById('wasteFood').textContent = state.food + ' ×1（あなたが選んだ食材と、同じもの）';
+  document.getElementById('wasteFood').textContent = state.food + ' ×1（増えた分の1つが、期限切れ）';
   go('day1');
+}
+
+/* 練習 */
+function showPractice2() { go('s-practice2'); }
+function answerPractice(ok, btn) {
+  btn.closest('.choices').querySelectorAll('button').forEach(b => { b.disabled = true; });
+  btn.classList.add('picked'); btn.disabled = false;
+  document.getElementById('practiceMsg').innerHTML = ok
+    ? '正解です。買っていない🍇が、ある。これが「齟齬」です。<br>本番では、こういうズレが3回出ます。報告するか、異常なしとするかは、あなたの判断です。正誤は、その場では示しません。'
+    : 'ズレは、ありました。買っていない🍇が、増えています。<br>本番では、こういうズレが3回出ます。報告するか、異常なしとするかは、あなたの判断です。正誤は、その場では示しません。';
+  const next = document.getElementById('toPrecheck');
+  next.classList.remove('hidden');
+  setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
+}
+
+/* 環境音（Web Audioで生成、ファイルなし） */
+let actx = null, soundNodes = null;
+function toggleSound() {
+  const btn = document.getElementById('soundBtn');
+  if (!actx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { btn.textContent = '🔇 音：非対応'; return; }
+    actx = new AC();
+    const g = actx.createGain(); g.gain.value = 0.0; g.connect(actx.destination);
+    const o1 = actx.createOscillator(); o1.type = 'sine'; o1.frequency.value = 55;
+    const og1 = actx.createGain(); og1.gain.value = 0.5; o1.connect(og1); og1.connect(g);
+    const o2 = actx.createOscillator(); o2.type = 'sine'; o2.frequency.value = 110;
+    const og2 = actx.createGain(); og2.gain.value = 0.12; o2.connect(og2); og2.connect(g);
+    const len = actx.sampleRate * 2;
+    const buf = actx.createBuffer(1, len, actx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const noise = actx.createBufferSource(); noise.buffer = buf; noise.loop = true;
+    const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 320;
+    const ng = actx.createGain(); ng.gain.value = 0.06;
+    noise.connect(f); f.connect(ng); ng.connect(g);
+    o1.start(); o2.start(); noise.start();
+    soundNodes = { g };
+  }
+  if (actx.state === 'running' && soundNodes.g.gain.value > 0) {
+    soundNodes.g.gain.linearRampToValueAtTime(0.0, actx.currentTime + 0.4);
+    btn.textContent = '🔇 音：オフ';
+  } else {
+    actx.resume();
+    soundNodes.g.gain.linearRampToValueAtTime(0.05, actx.currentTime + 0.6);
+    btn.textContent = '🔊 音：オン';
+  }
 }
 
 /* 齟齬チェック */
@@ -310,9 +410,11 @@ function answerCheck(n, noticed, btn) {
   sec.querySelectorAll('.choices button').forEach(b => { if (!b.id) b.disabled = true; });
   btn.classList.add('picked'); btn.disabled = false;
   document.getElementById('check' + n + 'Msg').textContent = noticed
-    ? '所見を記録しました。この齟齬は、後の照合に使います。'
-    : '所見を記録しました。観測を続けます。';
-  document.getElementById('toDay' + (n + 3)).classList.remove('hidden');
+    ? '報告を受け付けました。正誤は、ここでは示しません。'
+    : '異常なしとして、処理しました。正誤は、ここでは示しません。';
+  const next = document.getElementById('toDay' + (n + 3));
+  next.classList.remove('hidden');
+  setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
 }
 
 /* 結末 */
@@ -324,25 +426,25 @@ function showEnding() {
   let reveal = '';
   const rz = load('reizouko_v1');
   if (rz && rz.lastTraps && rz.lastTraps.length) {
-    reveal += '<p>照合：あなたの買い物の記録にも、同じ型がありました（' + rz.lastTraps.join('・') + '）。</p>';
+    reveal += '<p>照合：あなたの買い物の記録（冷蔵庫の記憶テスト）にも、同じ型がありました（' + rz.lastTraps.join('・') + '）。</p>';
   }
   if (state.score === 3) {
     title.textContent = '結末A「観測者」';
     log.innerHTML =
       '<p>種明かしを、開示します。</p>' +
       '<p>🍇：特売で買っていた。本人に、買った自覚がなかった。</p>' +
-      '<p>🥚の増加：不安になって、買い足していた。</p>' +
+      '<p>🥚の増加：不安になって、買い足していた。そしてDay6、Kは「最初から6個」と言った。本人の記憶の方が、書き換わっていたのです。</p>' +
       '<p>🥦の回帰：捨てたつもりで、捨てていなかった。</p>' +
       '<p>幽霊は、いません。全部、「見ていなかった」ことが原因でした。</p>' + reveal +
-      '<p>そして、もう1つ。被験者Kの記録は、あなたの回答（' + state.food + '）から再構成されています。観測していたつもりで、観測されていたのです。</p>';
+      '<p>そして、もう1つ。Kは仮名です。この記録の買い物パターンは、あなたの回答（' + state.food + '）をもとに組まれています。観測していたつもりで、観測されていたのです。</p>';
     line.textContent = 'あなたは、異変の全部に気づけました。現実でも、写真があれば、気づける側に回れます。';
   } else if (state.score >= 1) {
     title.textContent = '結末B「半分だけ見ていた」';
     const rows = [1, 2, 3].map(n => state.noticed[n]
-      ? '<p>' + CHECK_NAMES[n] + '：指摘済み。原因は、本人の忘却でした。</p>'
-      : '<p>' + CHECK_NAMES[n] + '：<span class="redact">原因は本人の忘却でしたが開示されません</span></p>').join('');
+      ? '<p>' + CHECK_NAMES[n] + '：報告済み。原因は、本人の忘却でした。</p>'
+      : '<p>' + CHECK_NAMES[n] + '：原因は、伏せられています。</p>').join('');
     log.innerHTML = rows + reveal +
-      '<p>被験者Kの記録は、あなたの回答（' + state.food + '）から再構成されています。その一部は、まだ伏せたままです。</p>';
+      '<p>Kは仮名です。この記録の買い物パターンは、あなたの回答（' + state.food + '）をもとに組まれています。その一部は、まだ伏せたままです。</p>';
     line.textContent = '見落とした分は、あなたの冷蔵庫でも起きています。';
   } else {
     title.textContent = '結末C「原因不明」';
