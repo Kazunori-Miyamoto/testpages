@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex" />
+<title>声かけの記憶テスト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  /* Layout: 枠なしの一枚紙。1画面＝顔・ことば・二択。選ぶたびに次の画面が下に現れる */
+  :root {
+    --paper: #f7f7f4;
+    --ink: #1a1a18;
+    --pencil: #77776f;
+    --tint: #ebebe6;
+    --tint-hover: #dcdcd5;
+    --night: #1a1a18;
+    --night-ink: #f2f2ec;
+    --f-hand: "Klee One", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive;
+    --f-body: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171715; --ink: #ecece6; --pencil: #9a9a92; --tint: #262623; --tint-hover: #34342f;
+      --night: #000000; --night-ink: #ecece6; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #171715; --ink: #ecece6; --pencil: #9a9a92; --tint: #262623; --tint-hover: #34342f;
+    --night: #000000; --night-ink: #ecece6; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: var(--f-body); font-size: 16px; line-height: 1.8;
+  }
+  main { display: flex; flex-direction: column; }
+
+  .screen {
+    min-height: 100svh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 28px; text-align: center;
+    padding-block: 72px;
+    padding-left: max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    transition: opacity .4s ease;
+    animation: rise .5s ease both;
+  }
+  @keyframes rise { from { opacity: .2; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .screen { animation: none; } }
+  .screen.done { opacity: .32; }
+  .inner { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+
+  .face { font-size: clamp(96px, 30vw, 148px); line-height: 1; user-select: none; }
+  .face.small { font-size: 64px; }
+  .say { font-family: var(--f-hand); font-size: clamp(18px, 4.8vw, 22px); line-height: 1.75; font-weight: 600; text-wrap: balance; }
+  .text { font-size: 16px; text-wrap: balance; }
+  .text.big { font-family: var(--f-hand); font-size: clamp(22px, 6vw, 30px); font-weight: 600; line-height: 1.6; }
+  .text.warn { font-family: var(--f-hand); font-size: clamp(21px, 5.8vw, 27px); font-weight: 600; line-height: 1.65; }
+  .text.big.xl { font-size: clamp(30px, 8.6vw, 42px); line-height: 1.5; }
+  .ask-form { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .free {
+    width: 100%; font: inherit; font-family: var(--f-hand); font-size: 20px; font-weight: 600; text-align: center;
+    color: var(--ink); background: var(--tint); border: 0; border-radius: 2px; padding: 14px 12px;
+  }
+  .free::placeholder { color: var(--pencil); font-weight: 400; }
+  .free:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .free:disabled { opacity: .6; }
+  .ask-form .choice { padding: 12px 36px; }
+  .note { font-size: 13px; color: var(--pencil); text-wrap: balance; }
+  .ask { font-size: 13px; color: var(--pencil); letter-spacing: .04em; }
+  h1 { font-family: var(--f-hand); font-weight: 600; font-size: clamp(28px, 8vw, 40px); margin: 0; letter-spacing: .04em; }
+
+  .pair { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid { width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .single { display: flex; justify-content: center; }
+  .choice {
+    font: inherit; font-size: 15px; line-height: 1.6; color: var(--ink);
+    background: var(--tint); border: 0; border-radius: 2px;
+    padding: 16px 14px; cursor: pointer; text-align: center; min-width: 0;
+    transition: background .15s ease, color .15s ease, opacity .2s ease;
+  }
+  .single .choice { padding: 14px 36px; }
+  .choice:hover:not(:disabled) { background: var(--tint-hover); }
+  .choice:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .choice:disabled { cursor: default; opacity: .35; }
+  .choice.picked { background: var(--ink); color: var(--paper); opacity: 1; }
+
+  .timer { width: 100%; max-width: 520px; height: 3px; background: var(--tint); overflow: hidden; }
+  .timer i { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left; }
+
+  .screen.night { background: var(--night); color: var(--night-ink); }
+  .screen.night .say { font-weight: 400; }
+  .screen.night .note { color: var(--night-ink); opacity: .6; }
+
+  .reveal p { margin: 0; }
+  .reveal .quote { font-family: var(--f-hand); font-weight: 600; font-size: 19px; }
+  .ending-name { font-size: 12px; letter-spacing: .16em; color: var(--pencil); }
+
+  .swap { width: 100%; display: flex; flex-direction: column; gap: 22px; text-align: left; }
+  .swap div { display: flex; flex-direction: column; gap: 4px; }
+  .swap s { color: var(--pencil); font-size: 14px; }
+  .swap span { font-family: var(--f-hand); font-weight: 600; font-size: 17px; }
+
+  .spacer { height: 12px; }
+  .cta { display: block; width: 100%; text-decoration: none; text-align: center; padding: 16px; background: var(--ink); color: var(--paper); font-weight: 700; border-radius: 2px; }
+  .cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .link-btn { font: inherit; font-size: 13px; color: var(--pencil); background: none; border: 0; padding: 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .link-btn:focus-visible { outline: 2px solid var(--ink); }
+  .test-badge { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 10px); right: max(12px, env(safe-area-inset-right, 0px)); font-size: 11px; color: var(--pencil); letter-spacing: .08em; z-index: 5; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="test-badge">TEST</div>
+<main id="app"></main>
+
+<script>
+(() => {
+  const STORE = "koekake_v2_test";
+  const URL_NAGOYA = "https://www.city.nagoya.jp/shisei/saiyou/1004301/1004438/index.html";
+  const URL_MEXT = "https://www.mext.go.jp/kids/find/kyoiku/mext_0005.html";
+  const app = document.getElementById("app");
+
+  const HAPPY = ["😊", "😆", "😁", "😄"];
+  const SAD = ["☹️", "😓", "😥", "😢", "😨", "😰", "😵"];
+  const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function load() { try { return JSON.parse(localStorage.getItem(STORE)) || null; } catch { return null; } }
+  function save(v) { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch {} }
+  function clear() { try { localStorage.removeItem(STORE); } catch {} }
+
+  // ---------- シナリオ ----------
+  const T1 = {
+    say: "「ぼく、せんせいになりたい！」",
+    A: "「いいね！どうしてなりたいと思ったの？」",
+    B: "「先生って今、すごく大変らしいよ〜」"
+  };
+  const T2 = {
+    A: {
+      say: "「泣いてたとき、先生がずっと話をきいてくれたの」",
+      A: "「すてきな理由だね。その気持ち、大事にしてね」",
+      B: "「でも先生って、夜遅くまで働いてるって聞くよ？」"
+    },
+    B: {
+      say: "「……そうなの？　でも先生、楽しそうだよ」",
+      A: "「楽しそうに見えるんだね。どんなところが？」",
+      B: "「きみは頭いいんだから、もっと上を目指せるよ」"
+    }
+  };
+  const T3 = {
+    AA: { say: "「ぼく、なれるかな？」", A: "「なれるよ。大変なこともあるけど、ずっと応援してる」", B: "「まあ、まだ先の話だし、ゆっくり考えな」" },
+    AB: { say: "「……やっぱり、たいへんなの？」", A: "「なれるよ。大変なこともあるけど、ずっと応援してる」", B: "「まあ、まだ先の話だし、ゆっくり考えな」" },
+    BA: { say: "「……ぼくにも、できるかな」", A: "「なれるよ。大変なこともあるけど、ずっと応援してる」", B: "「まあ、まだ先の話だし、ゆっくり考えな」" },
+    BB: { say: "「うえ？　先生って、下なの？」", A: "「ごめん、そういう意味じゃないよ。先生はすごい仕事だよ。応援してる」", B: "「ほら、お医者さんとか、もっとお給料のいい仕事もあるでしょ」" }
+  };
+  const OWN_REPHRASE = "「大変なこともあるけど、なりたいなら応援するよ」";
+  const REPHRASE = {
+    "「先生って今、すごく大変らしいよ〜」": "「大変なこともあるみたい。でも、どうしてなりたいと思ったの？」",
+    "「でも先生って、夜遅くまで働いてるって聞くよ？」": "「大変なところも一緒に調べてみようか。それでもなりたいか、考えてみよう」",
+    "「きみは頭いいんだから、もっと上を目指せるよ」": "「先生になったら、どんな授業をしてみたい？」",
+    "「まあ、まだ先の話だし、ゆっくり考えな」": "「いいね。いつか先生に、どうして先生になったのか聞いてみたら？」",
+    "「ほら、お医者さんとか、もっとお給料のいい仕事もあるでしょ」": "「先生のどんなところがかっこいいと思う？」"
+  };
+  // ---------- 状態 ----------
+  let S;
+  function fresh() {
+    return { dream: null, received: "none", receivedText: "", q2: null, picks: [], texts: [], neg: 0, ownShown: false, ownPicked: false };
+  }
+  // 入力文字の前後の空白・かぎかっこ・引用符を取り除く
+  function clean(s) { return String(s || "").trim().replace(/^[「『"“']+|[」』"”']+$/g, "").trim().slice(0, 60); }
+
+  function faceFor(pick) {
+    if (pick === "A") return S.neg === 0 ? rand(HAPPY) : "😊";
+    if (S.neg === 1) return "😐";
+    if (S.neg === 2) return "😟";
+    return rand(SAD);
+  }
+
+  // ---------- 画面部品 ----------
+  function el(tag, cls, html) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+  function screen(opts = {}) {
+    document.querySelectorAll(".screen:not(.done)").forEach((s) => s.classList.add("done"));
+    const sec = el("section", "screen" + (opts.night ? " night" : ""));
+    const inner = el("div", "inner");
+    sec.appendChild(inner);
+    app.appendChild(sec);
+    requestAnimationFrame(() => sec.scrollIntoView({ behavior: "smooth", block: "start" }));
+    return inner;
+  }
+
+  // choices: [{label, value}] → Promise<{value,label}>; layout: pair|grid|single; shuffle for pair
+  function choose(inner, choices, layout = "pair", shuffle = layout === "pair") {
+    return new Promise((resolve) => {
+      const box = el("div", layout);
+      const list = shuffle && Math.random() < 0.5 ? [...choices].reverse() : choices;
+      list.forEach((c) => {
+        const b = el("button", "choice");
+        b.type = "button";
+        b.textContent = c.label;
+        b.addEventListener("click", () => {
+          box.querySelectorAll("button").forEach((x) => (x.disabled = true));
+          b.classList.add("picked");
+          resolve(c);
+        });
+        box.appendChild(b);
+      });
+      inner.appendChild(box);
+      box._cancel = () => box.querySelectorAll("button").forEach((x) => (x.disabled = true));
+      inner._box = box;
+    });
+  }
+
+  // 自由入力 → Promise<string>（空欄でも進める）
+  function ask(inner, placeholder, id) {
+    return new Promise((resolve) => {
+      const form = el("form", "ask-form");
+      const input = el("input", "free");
+      input.type = "text"; input.id = id; input.placeholder = placeholder;
+      input.maxLength = 60; input.autocomplete = "off"; input.enterKeyHint = "next";
+      const btn = el("button", "choice", "つぎへ");
+      btn.type = "submit";
+      form.append(input, btn);
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        input.disabled = true; btn.disabled = true; btn.classList.add("picked");
+        input.blur();
+        resolve(input.value);
+      });
+      inner.appendChild(form);
+      setTimeout(() => { try { input.focus({ preventScroll: true }); } catch {} }, 450);
+    });
+  }
+
+  // ---------- 流れ ----------
+  async function start() {
+    app.innerHTML = "";
+    S = fresh();
+    const prev = load();
+
+    if (prev && prev.lastT3) {
+      const s = screen();
+      s.append(el("p", "text", "おかえりなさい。"),
+        el("p", "text", `前回、あなたはあの子に<br><b class="say">${esc(prev.lastT3)}</b><br>と言いました。`));
+      await choose(s, [{ label: "はじめる" }], "single");
+    }
+
+    let s = screen();
+    s.append(el("h1", null, "声かけの記憶テスト"),
+      el("p", "text", "いくつかの質問に答えてください。<br>所要時間は約3分です。"),
+      el("p", "note", "回答はこの端末のブラウザ内にだけ保存され、外部には送信されません。"));
+    await choose(s, [{ label: "はじめる" }], "single");
+
+    s = screen();
+    s.append(el("p", "text", "子どものころ、なりたかったものは何ですか？"));
+    S.dream = clean(await ask(s, "例：パイロット", "dream-input")) || null;
+
+    s = screen();
+    s.append(el("p", "text", "その夢を誰かに話したとき、<br>何と言われましたか？"), el("p", "note", "覚えている言葉を、そのまま書いてください"));
+    const said = clean(await ask(s, "例：そんなの無理だよ", "received-input"));
+
+    if (said) {
+      S.receivedText = `「${said}」`;
+      s = screen();
+      s.append(el("p", "text", `<span class="say">${esc(S.receivedText)}</span><br>その言葉は、あなたにとって……`));
+      const r = await choose(s, [{ label: "応援だった", v: "pos" }, { label: "反対だった", v: "neg" }, { label: "どちらでもない", v: "none" }], "grid", false);
+      S.received = r.v;
+    }
+
+    s = screen();
+    s.append(el("p", "text", "子どものころ大人に言われて、<br>今でも覚えている言葉はありますか？"));
+    await choose(s, [{ label: "ある" }, { label: "ない" }], "pair", false);
+
+    s = screen();
+    s.append(el("p", "text", "では、この1か月であなたが子どもにかけた言葉を、3つ思い出せますか？"), el("p", "note", "少し考えてから選んでください"));
+    const q2 = await choose(s, [{ label: "3つ思い出せる", v: 3 }, { label: "1つか2つ", v: 1 }, { label: "思い出せない", v: 0 }], "grid", false);
+    S.q2 = q2.v;
+
+    s = screen();
+    s.append(el("p", "text", "記録しました。"));
+    await wait(1200);
+    s.append(el("p", "text", "最後のテストです。<br>目の前の子に、声をかけてください。"));
+    await wait(1800);
+
+    await conversation();
+  }
+
+  async function turn(face, say, A, B) {
+    const s = screen();
+    s.append(el("div", "face", face), el("p", "say", esc(say)));
+    const c = await choose(s, [{ label: A, v: "A" }, { label: B, v: "B" }]);
+    S.picks.push(c.v); S.texts.push(c.label);
+    if (c.v === "B") S.neg++;
+    return c.v;
+  }
+
+  async function conversation() {
+    const p1 = await turn("😀", T1.say, T1.A, T1.B);
+    const t2 = T2[p1];
+    const p2 = await turn(faceFor(p1), t2.say, t2.A, t2.B);
+    const t3 = { ...T3[p1 + p2] };
+    // 冒頭で書いた「言われた言葉」を、最後の選択肢として出す
+    if (S.receivedText && S.received === "neg") { t3.B = S.receivedText; S.ownShown = true; }
+    else if (S.receivedText && S.received === "pos") { t3.A = S.receivedText; S.ownShown = true; }
+    const p3 = await turn(faceFor(p2), t3.say, t3.A, t3.B);
+    S.ownPicked = S.ownShown && S.texts[2] === S.receivedText;
+
+    const allA = S.picks.every((p) => p === "A");
+    const aCount = S.picks.filter((p) => p === "A").length;
+    const given = p3 === "A" && aCount >= 2 ? "pos" : "neg";
+    const flip = p1 === "B" && p3 === "A";
+
+    // 最後の一言への反応
+    let s = screen();
+    if (flip) {
+      s.append(el("div", "face", "😐"), el("p", "say", `「……さっきは${esc(S.texts[0].replace(/^「|」$/g, "『").replace(/『$/, "』"))}って言ってたのに」`));
+    } else {
+      s.append(el("div", "face", faceFor(p3)), el("p", "say", p3 === "A" ? "「……うん！」" : "「……うん。」"));
+    }
+    await wait(2400);
+
+    // 10年後
+    s = screen({ night: true });
+    let ten;
+    if (allA && S.received === "neg") {
+      ten = `——10年後。<br>教壇に立っている。<br>「先生、なんで先生になったの？」<br>「昔ね、ある大人に言われた言葉があって。<br>${esc(S.texts[2])}って」`;
+    } else if (given === "pos" && !flip) {
+      ten = "——10年後。<br>教育学部の願書に、名前を書いていた。";
+    } else if (flip) {
+      ten = "——10年後。<br>先生になるかどうか、まだ迷っている。<br>ときどき、あの日の最初の一言を思い出す。";
+    } else {
+      ten = "——10年後。<br>進路希望調査の第一希望に、「教員」とは書かなかった。<br>理由を聞かれても、うまく言えなかった。";
+    }
+    s.append(el("p", "say", ten));
+    await choose(s, [{ label: "つづける" }], "single");
+
+    // 種明かし
+    s = screen();
+    const rv = el("div", "reveal inner");
+    const lines = [];
+    lines.push(S.dream ? `あなたは子どものころ、「${esc(S.dream)}」になりたかった。` : "あなたにも、なりたかったものがあったはずです。");
+    lines.push(S.received === "none" ? "何と言われたかは、覚えていないかもしれません。" : `そして、<span class="quote">${esc(S.receivedText)}</span>と言われた。`);
+    rv.append(el("p", "text", lines.join("<br>")));
+    if (S.q2 !== 3) rv.append(el("p", "note", "言われた言葉は覚えているのに、言った言葉は思い出せませんでしたね。"));
+    rv.append(el("p", "text", `いま、あなたが最後に選んだ言葉は<br><span class="quote">${esc(S.texts[2])}</span>`));
+    if (S.ownShown) {
+      rv.append(el("p", "text big", S.ownPicked
+        ? "それは、あなたが子どものころに<br>言われた言葉でした。"
+        : "最後の選択肢のひとつは、<br>あなたが子どものころに<br>言われた言葉でした。"));
+    }
+    rv.append(el("p", "text big", "このテストが測っていたのは、<br>あなたの記憶力ではありません。<br>あの子の記憶に、<br>あなたの言葉がどう残るかでした。"));
+    s.appendChild(rv);
+    await choose(s, [{ label: "結果を見る" }], "single");
+
+    // エンディング
+    let key;
+    if (S.received === "neg") key = given === "pos" ? "E2" : "E1";
+    else if (S.received === "pos") key = given === "pos" ? "E3" : "E4";
+    else key = given === "pos" ? "E5" : "E4";
+    const rt = esc(S.receivedText);
+    const END = {
+      E1: { name: "連鎖", body: "あなたが言われた言葉は、<br>あなたのせいで生まれたものではありません。<br>きっと、あなたにそう言った人も、誰かに言われていました。<br>言葉はこうして、受け継がれていきます。<br>次に渡すかどうかは、選べます。", cta: "nagoya" },
+      E2: { name: "連鎖を断つ", body: `あなたは、受け取った言葉を渡しませんでした。<br>${rt}は、あなたのところで終わりました。<br>あの子が覚えているのは、あなたの「応援してる」です。`, cta: "mext" },
+      E3: { name: "受け継ぐ", body: "あなたがあの日もらった「いいね」は、<br>ちゃんと次へ渡されました。<br>あなたのその一言が、未来の先生をつくる第一歩になります。", cta: "mext" },
+      E4: { name: "渡されなかった", body: (S.received === "pos" ? "あなたは「いいね」と言ってもらえました。<br>今回、その言葉は渡されませんでした。" : "あなたは、何と言われたか覚えていません。") + "<br>あの子は、今日のあなたの言葉を覚えているかもしれません。", cta: "nagoya" },
+      E5: { name: "最初の一言", body: "あなたは、言われた言葉を覚えていないかもしれません。<br>でも今日、あの子は初めて「なれるよ」と言われました。<br>それが、あの子の覚えている最初の一言になります。", cta: "mext" }
+    }[key];
+
+    s = screen();
+    s.append(el("div", "face small", given === "pos" ? "😊" : faceFor("B")),
+      el("p", "ending-name", END.name),
+      el("p", "say", END.body));
+
+    const prev = load();
+    if (prev && prev.given === "neg" && given === "pos") {
+      s.append(el("p", "note", "今回は、違う言葉を選びましたね。<br>この画面は何度でもやり直せます。でも現実の会話に、やり直しはありません。<br>あの子が覚えているのは、最初の言葉です。"));
+    }
+    save({ plays: (prev?.plays || 0) + 1, lastT3: S.texts[2], given });
+
+    // 言い換え
+    const swaps = S.texts
+      .map((t, i) => (i === 2 && S.ownPicked && S.received === "neg") ? [t, OWN_REPHRASE] : [t, REPHRASE[t]])
+      .filter(([, alt]) => alt);
+    if (swaps.length) {
+      await choose(s, [{ label: "つづける" }], "single");
+      s = screen();
+      s.append(el("p", "text", "こうも言えます"));
+      const box = el("div", "swap");
+      swaps.forEach(([t, alt]) => box.append(el("div", null, `<s>${esc(t)}</s><span>${esc(alt)}</span>`)));
+      s.appendChild(box);
+    }
+
+    // いつも「いいね」を選んだ人への念押し
+    if (allA) {
+      await choose(s, [{ label: "つづける" }], "single");
+      await reminder();
+      s = screen();
+    }
+
+    finale(END.cta, s);
+  }
+
+  async function reminder() {
+    let s = screen();
+    s.append(el("p", "text warn", "……ひとつだけ。"));
+    await wait(1200);
+    s.append(el("p", "text warn", "あなたは、全部「いいね」を<br>選びました。<br>でも、現実の会話には、<br>考える時間がありません。"));
+    await wait(1600);
+    s.append(el("p", "text big", "もう一度。今度は3秒で。"));
+    await choose(s, [{ label: "はじめる" }], "single");
+
+    s = screen();
+    const face = el("div", "face", "😀");
+    s.append(face, el("p", "say", "「ぼく、せんせいになりたい！」"));
+    const bar = el("div", "timer", "<i></i>");
+    s.appendChild(bar);
+    const picking = choose(s, [{ label: "「いいね、なれるよ」", v: "A" }, { label: "「えー、先生？　大変だよ〜」", v: "B" }]);
+    const box = s._box;
+    const anim = bar.firstChild.animate([{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }], { duration: 3000, fill: "forwards" });
+    const result = await Promise.race([picking, wait(3000).then(() => ({ v: "T" }))]);
+    anim.pause();
+    if (result.v === "T") box._cancel();
+
+    let msg;
+    if (result.v === "A") { face.textContent = rand(HAPPY); msg = "画面の中なら、3秒でも選べます。"; }
+    else if (result.v === "B") { face.textContent = "😐"; msg = "とっさに出る言葉が、いちばん本音に近いのかもしれません。"; }
+    else { face.textContent = "😐"; msg = "黙っていることも、子どもにはひとつの答えに見えます。"; }
+    await wait(900);
+    s.append(el("p", "text warn", msg));
+    await wait(1800);
+
+    s = screen();
+    s.append(el("p", "text big xl", "現実でも、<br>本当にそう<br>言ってくれますか？"));
+    const c = await choose(s, [{ label: "言える", v: "yes" }, { label: "自信はない", v: "no" }], "pair", false);
+    s.append(el("p", "text warn", c.v === "yes"
+      ? "では明日、本当に言ってください。<br>あの子が覚えていられるのは、実際に言われた言葉だけです。"
+      : "その正直さが、最初の一歩です。<br>言えなかった言葉は、次に言えばいい。"));
+    await wait(1400);
+  }
+
+  function finale(cta, s) {
+    s.appendChild(el("div", "spacer"));
+    const a = el("a", "cta", cta === "mext" ? "先生へのなり方を見る ＞" : "名古屋市の教員の魅力を知る ＞");
+    a.href = cta === "mext" ? URL_MEXT : URL_NAGOYA;
+    a.target = "_blank"; a.rel = "noopener noreferrer";
+    const again = el("button", "choice", "もう一度やってみる");
+    again.type = "button";
+    again.addEventListener("click", start);
+    const reset = el("button", "link-btn", "履歴をリセット");
+    reset.type = "button";
+    let armed = false;
+    reset.addEventListener("click", () => {
+      if (!armed) { armed = true; reset.textContent = "もう一度押すとリセットします"; return; }
+      clear(); reset.textContent = "リセットしました"; reset.disabled = true;
+    });
+    s.append(a, again, reset);
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>
