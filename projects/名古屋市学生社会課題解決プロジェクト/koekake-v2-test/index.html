@@ -115,13 +115,22 @@
   .record-body dd { margin: 0; font-size: 15px; min-width: 0; overflow-wrap: anywhere; }
   .record-body dd.hand, .record-me dd { font-family: var(--f-hand); font-weight: 600; }
   .record-turns { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-  .record-turns li { display: grid; grid-template-columns: 5.5em 1fr 2em; gap: 10px; align-items: center; }
-  .record-turns .k { font-family: var(--f-hand); font-weight: 600; letter-spacing: .1em; }
-  .record-turns .v { font-size: 15px; min-width: 0; }
-  .record-turns .v small { display: block; font-size: 12px; color: var(--pencil); }
+  .record-turns li { display: grid; grid-template-columns: 4em 1fr 3.4em 3.4em; gap: 6px; align-items: center; }
+  .record-turns li.head .f { white-space: nowrap; font-size: 10px; color: var(--pencil); line-height: 1.3; }
+  .record-turns .k { font-family: var(--f-hand); font-weight: 600; letter-spacing: .06em; }
+  .record-turns .v { font-size: 14px; min-width: 0; }
+  .record-turns .v small { display: block; font-size: 11px; color: var(--pencil); }
   .record-turns .f { font-size: 22px; text-align: center; }
-  .record-faces { margin: 0; text-align: center; font-size: 26px; letter-spacing: .04em; }
-  .record-faces .arrow { font-size: 13px; color: var(--pencil); margin: 0 6px; vertical-align: middle; }
+  .record-ten { margin: 0; display: flex; justify-content: center; align-items: center; gap: 14px; }
+  .record-ten span { font-family: var(--f-hand); font-weight: 600; letter-spacing: .1em; }
+  .record-ten b { font-size: 34px; font-weight: 400; }
+  .record-better { display: flex; flex-direction: column; gap: 12px; }
+  .record-better p { margin: 0; font-size: 12px; color: var(--pencil); letter-spacing: .04em; }
+  .record-better div { display: flex; flex-direction: column; gap: 2px; }
+  .record-better s { font-size: 13px; color: var(--pencil); }
+  .record-better span { font-family: var(--f-hand); font-weight: 600; font-size: 15px; }
+  .record.masked .w { filter: blur(7px); user-select: none; }
+  .note.own { font-size: 14px; color: var(--ink); font-weight: 700; letter-spacing: .04em; }
   .record-foot { margin: 0; text-align: center; font-size: 12px; color: var(--pencil); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
   @media (max-width: 380px) { .record-body dl div { grid-template-columns: 1fr; gap: 0; } }
   .spacer { height: 12px; }
@@ -144,7 +153,6 @@
   const app = document.getElementById("app");
 
   const HAPPY = ["😊", "😆", "😁", "😄"];
-  const SAD = ["☹️", "😓", "😥", "😢", "😨", "😰", "😵"];
   const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -152,45 +160,39 @@
   function save(v) { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch {} }
   function clear() { try { localStorage.removeItem(STORE); } catch {} }
 
-  // ---------- シナリオ ----------
-  const T1 = {
-    say: "「ぼく、せんせいになりたい！」",
-    A: "「いいね！どうしてなりたいと思ったの？」",
-    B: "「先生って今、すごく大変らしいよ〜」"
-  };
+  const DEFAULT_HAPPY = "いいね！なれるよ";
+  const DEFAULT_SAD = "先生って今、大変らしいよ〜";
+
+  // 各選択肢：見えた顔（その場の反応）と、本当の気持ち（見えない）
+  // T1 は冒頭で書いた「うれしかった言葉」と「悲しかった言葉」
   const T2 = {
-    A: { say: "「泣いてたとき、先生がずっと話をきいてくれたの」", A: "「すてきな理由だね。その気持ち、大事にしてね」", B: "「でも先生って、夜遅くまで働いてるって聞くよ？」" },
-    B: { say: "「……そうなの？　でも先生、楽しそうだよ」", A: "「楽しそうに見えるんだね。どんなところが？」", B: "「きみは頭いいんだから、もっと上を目指せるよ」" }
+    A: "「だって先生って、カッコいいんだもん！　……でも、たいへんなの？」",
+    B: "「……でも先生、カッコいいよ。そんなにたいへんなの？」",
+    X: { text: "「大変じゃないよ、楽しいよ！」", tag: "安心させる嘘", seen: "joy", heart: "😊" },
+    Y: { text: "「大変なこともあるよ。それでもなりたい？」", tag: "正直に伝えた", seen: "😐", heart: "🙂" }
   };
   const T3 = {
-    AA: { say: "「ぼく、なれるかな？」", A: "「なれるよ。大変なこともあるけど、ずっと応援してる」", B: "「まあ、まだ先の話だし、ゆっくり考えな」" },
-    AB: { say: "「……やっぱり、たいへんなの？」", A: "「なれるよ。大変なこともあるけど、ずっと応援してる」", B: "「まあ、まだ先の話だし、ゆっくり考えな」" },
-    BA: { say: "「……ぼくにも、できるかな」", A: "「なれるよ。大変なこともあるけど、ずっと応援してる」", B: "「まあ、まだ先の話だし、ゆっくり考えな」" },
-    BB: { say: "「うえ？　先生って、下なの？」", A: "「ごめん、そういう意味じゃないよ。先生はすごい仕事だよ。応援してる」", B: "「ほら、お医者さんとか、もっとお給料のいい仕事もあるでしょ」" }
+    X: "「じゃあ、ぼくでもなれるよね！」",
+    Y: "「……うん。それでも、なりたい」",
+    P: { text: "「絶対なれるよ！」", tag: "勢いの応援", seen: "joy", heart: "😊" },
+    Q: { text: "「簡単じゃないよ。でも、ずっと応援してる」", tag: "支える応援", seen: "🙂", heart: "😊" }
   };
-  const REPHRASE = {
-    "「先生って今、すごく大変らしいよ〜」": "「大変なこともあるみたい。でも、どうしてなりたいと思ったの？」",
-    "「でも先生って、夜遅くまで働いてるって聞くよ？」": "「大変なところも一緒に調べてみようか。それでもなりたいか、考えてみよう」",
-    "「きみは頭いいんだから、もっと上を目指せるよ」": "「先生になったら、どんな授業をしてみたい？」",
-    "「まあ、まだ先の話だし、ゆっくり考えな」": "「いいね。いつか先生に、どうして先生になったのか聞いてみたら？」",
-    "「ほら、お医者さんとか、もっとお給料のいい仕事もあるでしょ」": "「先生のどんなところがかっこいいと思う？」"
+  const BETTER = {
+    sad: "「大変なこともあるけど、なりたいなら応援するよ」",
+    X: T2.Y.text,
+    P: T3.Q.text
   };
-  const OWN_REPHRASE = "「大変なこともあるけど、なりたいなら応援するよ」";
 
   // ---------- 状態 ----------
   let S;
   function fresh() {
-    return { dream: null, happy: "", sad: "", picks: [], texts: [], faces: ["😀"], neg: 0, own: null, quick: null, answer: null };
+    return { dream: null, happy: "", sad: "", ownHappy: false, ownSad: false, picks: [], rows: [], quick: null, answer: null };
   }
   function clean(s) { return String(s || "").trim().replace(/^[「『"“']+|[」』"”']+$/g, "").trim().slice(0, 60); }
-  const quote = (s) => (s ? `「${s}」` : "");
-
-  function faceFor(pick) {
-    if (pick === "A") return S.neg === 0 ? rand(HAPPY) : "😊";
-    if (S.neg === 1) return "😐";
-    if (S.neg === 2) return "😟";
-    return rand(SAD);
-  }
+  const q = (s) => `「${s}」`;
+  const face = (f) => (f === "joy" ? rand(HAPPY) : f);
+  // 子どもの夢の職業名を「先生」に置き換えて、目の前の子に向けた言葉にする
+  const toTeacher = (s) => (S.dream && S.dream !== "先生" ? s.split(S.dream).join("先生") : s);
 
   // ---------- 画面部品 ----------
   function el(tag, cls, html) {
@@ -210,6 +212,7 @@
     requestAnimationFrame(() => sec.scrollIntoView({ behavior: "smooth", block: "start" }));
     return inner;
   }
+  const lastInner = () => app.lastElementChild.querySelector(".inner");
 
   function choose(inner, choices, layout = "pair", shuffle = layout === "pair") {
     return new Promise((resolve) => {
@@ -258,10 +261,10 @@
     S = fresh();
     const prev = load();
 
-    if (prev && prev.lastT3) {
+    if (prev && prev.first) {
       const s = screen();
-      s.append(el("p", "text", "おかえりなさい。"),
-        el("p", "text", `前回、あなたはあの子に<br><b class="say">${esc(prev.lastT3)}</b><br>と言いました。`));
+      s.append(el("p", "text warn", "おかえりなさい。"),
+        el("p", "text", `前回、あなたが最初にかけた言葉は<br><b class="say">${esc(prev.first)}</b><br>でした。`));
       await choose(s, [{ label: "はじめる" }], "single");
     }
 
@@ -272,208 +275,178 @@
     await choose(s, [{ label: "はじめる" }], "single");
 
     s = screen();
-    s.append(el("p", "text", "子どものころ、なりたかったものは何ですか？"));
+    s.append(el("p", "text", "子どものころ、<br>なりたかったものは何ですか？"));
     S.dream = clean(await ask(s, "例：パイロット", "dream-input")) || null;
 
+    const said = S.dream ? `<span class="say">「${esc(S.dream)}になりたい！」</span><br>とオトナに話したとき、` : "その夢をオトナに話したとき、";
     s = screen();
-    s.append(el("p", "text", "その夢を話したとき、オトナに言われて<br><b>うれしかった</b>言葉はありますか？"),
-      el("p", "note", "覚えている言葉を、そのまま書いてください。なければ空欄で進めます"));
+    s.append(el("p", "text", `${said}<br>言われて<b>うれしかった</b>言葉は？`),
+      el("p", "note", "覚えている言葉を、そのまま書いてください"));
     S.happy = clean(await ask(s, "例：きっとなれるよ", "happy-input"));
 
     s = screen();
-    s.append(el("p", "text", "では、言われて<br><b>悲しかった</b>言葉は？"),
+    s.append(el("p", "text", `では、<br>言われて<b>悲しかった</b>言葉は？`),
       el("p", "note", "思い出したくない場合は、空欄で進めてください"));
     S.sad = clean(await ask(s, "例：そんなの無理だよ", "sad-input"));
 
+    S.ownHappy = !!S.happy; S.ownSad = !!S.sad;
+    S.happy = S.happy ? toTeacher(S.happy) : DEFAULT_HAPPY;
+    S.sad = S.sad ? toTeacher(S.sad) : DEFAULT_SAD;
+
     s = screen();
-    s.append(el("p", "text", "記録しました。"));
-    await wait(1200);
-    s.append(el("p", "text", "では、目の前の子に、<br>声をかけてください。"));
+    const mem = [];
+    if (S.ownHappy) mem.push(`うれしかった言葉<br><span class="say">${esc(q(S.happy))}</span>`);
+    if (S.ownSad) mem.push(`悲しかった言葉<br><span class="say">${esc(q(S.sad))}</span>`);
+    if (mem.length) s.append(el("p", "text", mem.join("<br><br>")));
+    s.append(el("p", "text warn", "記録しました。"));
+    await wait(1400);
+    s.append(el("p", "text", "では、目の前の子に<br>声をかけてください。"));
     await wait(1800);
 
     await conversation();
   }
 
-  async function turn(face, say, A, B) {
+  async function turn(seenFace, say, choices, note) {
     const s = screen();
-    s.append(el("div", "face", face), el("p", "say", esc(say)));
-    const c = await choose(s, [{ label: A, v: "A" }, { label: B, v: "B" }]);
-    S.picks.push(c.v); S.texts.push(c.label);
-    if (c.v === "B") S.neg++;
-    S.faces.push(faceFor(c.v));
-    return c.v;
+    s.append(el("div", "face", seenFace), el("p", "say", esc(say)));
+    const p = choose(s, choices);
+    if (note) s.append(el("p", "note own", note));
+    return p;
   }
 
   async function conversation() {
-    const p1 = await turn(S.faces[0], T1.say, T1.A, T1.B);
-    const t2 = T2[p1];
-    const p2 = await turn(S.faces[1], t2.say, t2.A, t2.B);
+    // T1：自分が言われた言葉で答える
+    const note = S.ownHappy && S.ownSad ? "どちらも、あなたが言われた言葉です"
+      : (S.ownHappy || S.ownSad) ? "片方は、あなたが言われた言葉です" : "";
+    const c1 = await turn("😀", "「ぼく、せんせいになりたい！」",
+      [{ label: q(S.happy), v: "A" }, { label: q(S.sad), v: "B" }], note);
+    const r1 = c1.v === "A"
+      ? { text: q(S.happy), tag: "背中を押した", seen: rand(HAPPY), heart: rand(HAPPY), own: S.ownHappy ? "うれしかった言葉" : "" }
+      : { text: q(S.sad), tag: "ブレーキをかけた", seen: "🙂", heart: "😥", own: S.ownSad ? "悲しかった言葉" : "" };
+    S.picks.push(c1.v); S.rows.push(r1);
 
-    // 最後の二択は、冒頭で書いた「うれしかった言葉」と「悲しかった言葉」
-    const t3 = { ...T3[p1 + p2] };
-    if (S.happy) t3.A = quote(S.happy);
-    if (S.sad) t3.B = quote(S.sad);
-    const p3 = await turn(S.faces[2], t3.say, t3.A, t3.B);
-    if (p3 === "A" && S.happy) S.own = "happy";
-    if (p3 === "B" && S.sad) S.own = "sad";
+    // T2：やさしい嘘か、正直か
+    const c2 = await turn(r1.seen, T2[c1.v], [{ label: T2.X.text, v: "X" }, { label: T2.Y.text, v: "Y" }]);
+    const o2 = T2[c2.v];
+    const r2 = { ...o2, seen: face(o2.seen) };
+    S.picks.push(c2.v); S.rows.push(r2);
 
-    const allA = S.picks.every((p) => p === "A");
-    const aCount = S.picks.filter((p) => p === "A").length;
-    const given = p3 === "A" && aCount >= 2 ? "pos" : "neg";
-    const flip = p1 === "B" && p3 === "A";
+    // T3：勢いの応援か、支える応援か
+    const c3 = await turn(r2.seen, T3[c2.v], [{ label: T3.P.text, v: "P" }, { label: T3.Q.text, v: "Q" }]);
+    const o3 = T3[c3.v];
+    const r3 = { ...o3, seen: face(o3.seen) };
+    S.picks.push(c3.v); S.rows.push(r3);
+
+    const [p1, p2, p3] = S.picks;
+    let key;
+    if (p1 === "B") key = p3 === "Q" ? "undo" : "chain";
+    else key = (p2 === "Y" && p3 === "Q") ? "pass" : "sweet";
 
     // 最後の一言への反応
     let s = screen();
-    if (flip) {
-      s.append(el("div", "face", "😐"), el("p", "say", `「……さっきは『${esc(S.texts[0].replace(/^「|」$/g, ""))}』って言ってたのに」`));
+    if (key === "undo") {
+      s.append(el("div", "face", "😐"), el("p", "say", `「……さっきは『${esc(S.sad)}』って言ってたのに」`));
     } else {
-      s.append(el("div", "face", S.faces[3]), el("p", "say", p3 === "A" ? "「……うん！」" : "「……うん。」"));
+      s.append(el("div", "face", r3.seen), el("p", "say", "「うん！」"));
     }
-    await wait(2400);
+    await wait(2000);
 
     // 10年後
-    s = screen({ night: true });
-    let ten;
-    if (allA && S.own === "happy") {
-      ten = `——10年後。<br>教壇に立っている。<br>「先生、なんで先生になったの？」<br>「昔ね、ある大人に言われた言葉があって。<br>${esc(S.texts[2])}って」`;
-    } else if (given === "pos" && !flip) {
-      ten = "——10年後。<br>教育学部の願書に、名前を書いていた。";
-    } else if (flip) {
-      ten = "——10年後。<br>先生になるかどうか、まだ迷っている。<br>ときどき、あの日の最初の一言を思い出す。";
-    } else {
-      ten = "——10年後。<br>進路希望調査の第一希望に、「教員」とは書かなかった。<br>理由を聞かれても、うまく言えなかった。";
-    }
-    s.append(el("p", "say", ten));
-    await choose(s, [{ label: "つづける" }], "single");
-
-    // 種明かし
-    s = screen();
-    const rv = el("div", "reveal inner");
-    const lines = [S.dream ? `あなたは子どものころ、「${esc(S.dream)}」になりたかった。` : "あなたにも、なりたかったものがあったはずです。"];
-    if (S.happy) lines.push(`<span class="quote">${esc(quote(S.happy))}</span>と言われて、うれしかった。`);
-    if (S.sad) lines.push(`<span class="quote">${esc(quote(S.sad))}</span>と言われて、悲しかった。`);
-    rv.append(el("p", "text", lines.join("<br>")));
-    rv.append(el("p", "text", `いま、あなたが最後に選んだ言葉は<br><span class="quote">${esc(S.texts[2])}</span>`));
-    if (S.own === "happy") rv.append(el("p", "text big", "それは、あなたが<br>うれしかった言葉でした。"));
-    else if (S.own === "sad") rv.append(el("p", "text big", "それは、あなたが<br>悲しかった言葉でした。"));
-    else if (S.happy || S.sad) rv.append(el("p", "text big", "もう一方の選択肢は、<br>あなたが子どものころに<br>言われた言葉でした。"));
-    rv.append(el("p", "text big", "このテストが測っていたのは、<br>あなたの記憶力ではありません。<br>あの子の記憶に、<br>あなたの言葉がどう残るかでした。"));
-    s.appendChild(rv);
-    await choose(s, [{ label: "つづける" }], "single");
-
-    // エンディング
-    const key = flip ? "undo" : given === "pos" ? "pass" : "chain";
-    const END = {
-      pass: {
-        name: "受け継ぐ",
-        body: S.own === "happy"
-          ? "あなたがうれしかった言葉を、<br>今度はあなたが、あの子に渡しました。<br>あなたのその一言が、未来の先生をつくる第一歩になります。"
-          : "あなたの一言は、あの子の背中を押しました。<br>その一言が、未来の先生をつくる第一歩になります。",
-        cta: "mext"
-      },
-      chain: {
-        name: "連鎖",
-        body: (S.own === "sad"
-          ? "あなたが悲しかった言葉を、<br>あなたは、あの子に渡しました。<br>"
-          : "") + "あなたに悲しい言葉をかけた人にも、<br>きっと悪気はありませんでした。<br>言葉はこうして、受け継がれていきます。<br>次に渡すかどうかは、選べます。",
-        cta: "nagoya"
-      },
-      undo: {
-        name: "取り消せない一言",
-        body: `最後には、背中を押す言葉を言えました。<br>でも、あの子が最初に聞いたのは<br>${esc(S.texts[0])}でした。<br>現実の会話に、やり直しはありません。`,
-        cta: "nagoya"
-      }
+    const TEN = {
+      pass:  { face: "😄", text: "——10年後。<br>教壇に立っている。<br>「大変だよ。でも、なってよかった」" },
+      sweet: p2 === "X"
+        ? { face: "😓", text: "——10年後。<br>教育実習の帰り道。<br>「大変じゃないって、言ってたのに」" }
+        : { face: "😢", text: "——10年後。<br>採用試験に落ちた。<br>「絶対なれるって、言われてたのに」" },
+      undo:  { face: "🙂", text: `——10年後。<br>先生になった。<br>でも、最初に言われた<br>${esc(q(S.sad))}は、<br>今も覚えている。` },
+      chain: { face: "😐", text: "——10年後。<br>進路希望調査に、<br>「教員」とは書かなかった。" }
     }[key];
+    S.ten = TEN.face;
+    s = screen({ night: true });
+    s.append(el("div", "face small", TEN.face), el("p", "say", TEN.text));
+    await choose(s, [{ label: "つづける" }], "single");
 
+    // 最終メッセージ（短く）
+    const LAST = {
+      pass:  { line: "あなたの一言が、<br>先生をつくる。", cta: "mext" },
+      sweet: { line: "その場の笑顔と、<br>10年後の笑顔は、<br>ちがう。", cta: "mext" },
+      undo:  { line: "最初の一言は、<br>取り消せない。", cta: "nagoya" },
+      chain: { line: S.ownSad ? "その言葉、<br>あなたも<br>言われましたね。" : "言葉は、<br>こうして受け継がれる。", cta: "nagoya" }
+    }[key];
     s = screen();
-    s.append(el("div", "face small", S.faces[3]), el("p", "ending-name", END.name), el("p", "say", END.body));
+    s.append(el("p", "text", "言った言葉は、忘れる。<br>言われた言葉は、忘れない。"));
+    await wait(1600);
+    s.append(el("p", "text big xl", LAST.line));
     const prev = load();
-    if (prev && prev.given === "neg" && given === "pos") {
-      s.append(el("p", "note", "今回は、違う言葉を選びましたね。<br>この画面は何度でもやり直せます。でも現実の会話に、やり直しはありません。<br>あの子が覚えているのは、最初の言葉です。"));
+    if (prev && prev.key && prev.key !== "pass" && key === "pass") {
+      await wait(1000);
+      s.append(el("p", "note", "ただし、現実の会話に<br>やり直しはありません。"));
     }
     const plays = (prev?.plays || 0) + 1;
-    save({ plays, lastT3: S.texts[2], given });
+    save({ plays, first: r1.text, key });
+    await wait(900);
 
-    // 言い換え
-    const swaps = S.texts
-      .map((t, i) => (i === 2 && S.own === "sad") ? [t, OWN_REPHRASE] : [t, REPHRASE[t]])
-      .filter(([, alt]) => alt);
-    if (swaps.length) {
-      await choose(s, [{ label: "つづける" }], "single");
-      s = screen();
-      s.append(el("p", "text", "こうも言えます"));
-      const box = el("div", "swap");
-      swaps.forEach(([t, alt]) => box.append(el("div", null, `<s>${esc(t)}</s><span>${esc(alt)}</span>`)));
-      s.appendChild(box);
-    }
-
-    // いつも「いいね」を選んだ人への念押し
-    if (allA) {
+    if (key === "pass") {
       await choose(s, [{ label: "つづける" }], "single");
       await reminder();
     }
-
     await choose(lastInner(), [{ label: "記録を見る" }], "single");
-    result(END, plays, flip);
+    result(key, LAST.cta, plays);
   }
 
-  const lastInner = () => app.lastElementChild.querySelector(".inner");
-
+  // 理想の答えを選んだ人への念押し
   async function reminder() {
     let s = screen();
     s.append(el("p", "text warn", "……ひとつだけ。"));
-    await wait(1200);
-    s.append(el("p", "text warn", "あなたは、全部「いいね」を<br>選びました。<br>でも、現実の会話には、<br>考える時間がありません。"));
-    await wait(1600);
+    await wait(1100);
+    s.append(el("p", "text warn", "現実の会話には、<br>考える時間がありません。"));
+    await wait(1500);
     s.append(el("p", "text big", "もう一度。今度は3秒で。"));
     await choose(s, [{ label: "はじめる" }], "single");
 
     s = screen();
-    const face = el("div", "face", "😀");
-    s.append(face, el("p", "say", "「ぼく、せんせいになりたい！」"));
+    const f = el("div", "face", "😀");
+    s.append(f, el("p", "say", "「ぼく、せんせいになりたい！」"));
     const bar = el("div", "timer", "<i></i>");
     s.appendChild(bar);
-    const picking = choose(s, [{ label: "「いいね、なれるよ」", v: "A" }, { label: "「えー、先生？　大変だよ〜」", v: "B" }]);
+    const picking = choose(s, [{ label: q(S.happy), v: "A" }, { label: q(S.sad), v: "B" }]);
     const box = s._box;
     const anim = bar.firstChild.animate([{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }], { duration: 3000, fill: "forwards" });
-    const result = await Promise.race([picking, wait(3000).then(() => ({ v: "T" }))]);
+    const r = await Promise.race([picking, wait(3000).then(() => ({ v: "T" }))]);
     anim.pause();
-    if (result.v === "T") box._cancel();
-    S.quick = result.v;
-
-    let msg;
-    if (result.v === "A") { face.textContent = rand(HAPPY); msg = "画面の中なら、3秒でも選べます。"; }
-    else if (result.v === "B") { face.textContent = "😐"; msg = "とっさに出る言葉が、いちばん本音に近いのかもしれません。"; }
-    else { face.textContent = "😐"; msg = "黙っていることも、子どもにはひとつの答えに見えます。"; }
-    await wait(900);
+    if (r.v === "T") box._cancel();
+    S.quick = r.v;
+    const msg = { A: "画面の中なら、<br>3秒でも選べます。", B: "とっさに出るのは、<br>言われた言葉です。", T: "黙ることも、<br>ひとつの答えです。" }[r.v];
+    f.textContent = r.v === "A" ? rand(HAPPY) : "😐";
+    await wait(800);
     s.append(el("p", "text warn", msg));
-    await wait(1800);
+    await wait(1600);
 
     s = screen();
     s.append(el("p", "text big xl", "現実でも、<br>本当にそう<br>言ってくれますか？"));
     const c = await choose(s, [{ label: "言える", v: "yes" }, { label: "自信はない", v: "no" }], "pair", false);
     S.answer = c.v;
-    s.append(el("p", "text warn", c.v === "yes"
-      ? "では明日、本当に言ってください。<br>あの子が覚えていられるのは、実際に言われた言葉だけです。"
-      : "その正直さが、最初の一歩です。<br>言えなかった言葉は、次に言えばいい。"));
-    await wait(1400);
+    s.append(el("p", "text warn", c.v === "yes" ? "では明日、<br>本当に言ってください。" : "その正直さが、<br>最初の一歩です。"));
+    await wait(1200);
   }
 
   // ---------- リザルト ----------
-  function result(END, plays, flip) {
+  function result(key, cta, plays) {
     const s = screen();
     const d = new Date();
     const date = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
     const NUM = ["第一問", "第二問", "第三問"];
-    const pickLabel = (i) => {
-      const base = S.picks[i] === "A" ? "背中を押した" : "ブレーキをかけた";
-      if (i === 2 && S.own === "happy") return base + "<small>あなたがうれしかった言葉</small>";
-      if (i === 2 && S.own === "sad") return base + "<small>あなたが悲しかった言葉</small>";
-      return base;
-    };
-    const rows = S.picks.map((_, i) => `<li><span class="k">${NUM[i]}</span><span class="v">${pickLabel(i)}</span><span class="f">${S.faces[i + 1]}</span></li>`).join("");
-    const quickLabel = { A: "間に合った", B: "とっさに迷った", T: "黙ってしまった" }[S.quick];
-    const remembered = flip ? S.texts[0] : S.texts[2];
+    const NAME = { pass: "支える一言", sweet: "やさしい嘘", undo: "取り消せない一言", chain: "受け継がれた言葉" };
+    const rows = S.rows.map((r, i) => `
+      <li>
+        <span class="k">${NUM[i]}</span>
+        <span class="v">${esc(r.tag)}${r.own ? `<small>あなたが${r.own}</small>` : ""}</span>
+        <span class="f">${r.seen}</span><span class="f">${r.heart}</span>
+      </li>`).join("");
+    const better = [];
+    if (S.picks[0] === "B") better.push([S.rows[0].text, BETTER.sad]);
+    if (S.picks[1] === "X") better.push([S.rows[1].text, BETTER.X]);
+    if (S.picks[2] === "P") better.push([S.rows[2].text, BETTER.P]);
+    const quick = { A: "間に合った", B: "とっさに迷った", T: "黙ってしまった" }[S.quick];
 
     const card = el("div", "record");
     card.innerHTML = `
@@ -481,27 +454,36 @@
       <div class="record-body">
         <h2>声かけの記録</h2>
         <dl class="record-me">
-          <div><dt>子どもの頃の夢</dt><dd>${esc(S.dream || "（未記入）")}</dd></div>
-          <div><dt>うれしかった言葉</dt><dd>${esc(quote(S.happy) || "（未記入）")}</dd></div>
-          <div><dt>悲しかった言葉</dt><dd>${esc(quote(S.sad) || "（未記入）")}</dd></div>
+          <div><dt>子どもの頃の夢</dt><dd class="w">${esc(S.dream || "（未記入）")}</dd></div>
+          <div><dt>うれしかった言葉</dt><dd class="w">${S.ownHappy ? esc(q(S.happy)) : "（未記入）"}</dd></div>
+          <div><dt>悲しかった言葉</dt><dd class="w">${S.ownSad ? esc(q(S.sad)) : "（未記入）"}</dd></div>
         </dl>
-        <ul class="record-turns">${rows}
-          ${S.quick ? `<li><span class="k">3秒の問い</span><span class="v">${quickLabel}</span><span class="f"></span></li>` : ""}
+        <ul class="record-turns">
+          <li class="head"><span></span><span></span><span class="f">見えた顔</span><span class="f">心の中</span></li>
+          ${rows}
         </ul>
-        <p class="record-faces">${S.faces.join('<span class="arrow">→</span>')}</p>
+        <p class="record-ten"><span>10年後</span><b>${S.ten}</b></p>
         <dl class="record-end">
-          <div><dt>結末</dt><dd>${esc(END.name)}</dd></div>
-          <div><dt>記憶に残る言葉</dt><dd class="hand">${esc(remembered)}</dd></div>
+          <div><dt>結末</dt><dd>${NAME[key]}</dd></div>
+          ${quick ? `<div><dt>3秒の問い</dt><dd>${quick}</dd></div>` : ""}
           ${S.answer ? `<div><dt>現実でも言えるか</dt><dd>${S.answer === "yes" ? "言える" : "自信はない"}</dd></div>` : ""}
         </dl>
+        ${better.length ? `<div class="record-better"><p>こう言えたかも</p>${better.map(([a, b]) => `<div><s class="w">${esc(a)}</s><span>${esc(b)}</span></div>`).join("")}</div>` : ""}
         <p class="record-foot">${date}　／　${plays}回目の記録</p>
       </div>
-      <p class="note">結果はスクリーンショットで保存して、シェアできます</p>`;
+      <p class="note">スクリーンショットで保存して、シェアできます</p>`;
     s.appendChild(card);
 
-    s.appendChild(el("div", "spacer"));
-    const a = el("a", "cta", END.cta === "mext" ? "先生へのなり方を見る ＞" : "名古屋市の教員の魅力を知る ＞");
-    a.href = END.cta === "mext" ? URL_MEXT : URL_NAGOYA;
+    const hide = el("button", "link-btn", "自分の言葉を隠す");
+    hide.type = "button";
+    hide.addEventListener("click", () => {
+      const on = card.classList.toggle("masked");
+      hide.textContent = on ? "自分の言葉を表示する" : "自分の言葉を隠す";
+    });
+    s.append(hide, el("div", "spacer"));
+
+    const a = el("a", "cta", cta === "mext" ? "先生へのなり方を見る ＞" : "名古屋市の教員の魅力を知る ＞");
+    a.href = cta === "mext" ? URL_MEXT : URL_NAGOYA;
     a.target = "_blank"; a.rel = "noopener noreferrer";
     const again = el("button", "choice", "もう一度やってみる");
     again.type = "button";
