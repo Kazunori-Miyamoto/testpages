@@ -64,14 +64,9 @@
   }
   .hidden { display: none !important; }
   .big { font-size: 34px; }
-  #soundBtn {
-    position: fixed; top: 12px; right: 12px; z-index: 60; width: auto;
-    padding: 8px 14px; font-size: 14px; background: rgba(10,10,10,.85);
-  }
 </style>
 </head>
 <body>
-<button id="soundBtn" onclick="toggleSound()">🔇 音：オフ</button>
 
 <!-- 0. 研究所トップ -->
 <section id="s0">
@@ -84,11 +79,12 @@
     <p>方法：冷蔵庫内を定点観測し、購入記録・廃棄記録・本人の証言と照合する。</p>
     <p>被験者K：大学2年、一人暮らし。本人の同意のもと、氏名は伏せて公開する。</p>
   </div>
-  <p class="small">※この記録は、あなたの端末内にだけ保存されます。外部に送信されることはありません。<br>※右上のボタンで、観測室の環境音を出せます（任意）。</p>
+  <p class="small">※この記録は、あなたの端末内にだけ保存されます。外部に送信されることはありません。<br>※下のボタンで、観測室の環境音を出せます（任意）。</p>
   <div id="revisit" class="hidden">
     <p id="revisitText"></p>
   </div>
   <div class="choices">
+    <button class="plain" id="soundBtn" onclick="toggleSound()">🔇 音：オフ（観測室の環境音）</button>
     <button class="primary" onclick="go('s-practice')">まず、練習記録を開く</button>
   </div>
 </section>
@@ -150,17 +146,17 @@
 <!-- Day1 -->
 <section id="day1">
   <p class="ts">DAY 1 ― 08:00　初期観測</p>
-  <div class="grid">
+  <div id="g-day1"><div class="grid">
     <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>🥩</div><div>🍐🍐</div>
-  </div>
+  </div></div>
   <div class="log">
     <p class="q">観測者：卵について、教えてください。</p>
     <p class="a">K：「卵は、常にあります。切らしたこと、ないですね」</p>
   </div>
   <div class="choices">
-    <button class="primary" onclick="go('day2')">Day 2 へ</button>
+    <button class="primary" onclick="advance('day2','g-day1')">Day 2 へ</button>
   </div>
 </section>
 
@@ -169,25 +165,41 @@
   <p class="ts">DAY 2 ― 19:42　購入記録あり</p>
   <div class="receipt">🍞<br>🧻<br>🍙</div>
   <p class="ts">DAY 2 ― 21:05　観測</p>
-  <div class="grid">
+  <div id="g-day2"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍐</div>
-  </div>
+  </div></div>
   <p>購入品のうち🍞🧻🍙は、冷蔵庫の外で保管されるものとして記録されている。<br>🥩と🥛1本の減少は、Kの食事記録と一致。異常なし。</p>
   <div class="choices">
-    <button class="primary" onclick="go('day3')">Day 3 へ</button>
+    <button class="primary" onclick="advance('n1','g-day2')">Day 3 へ</button>
+  </div>
+</section>
+
+
+<!-- ノイズ1：他被験者の記録 -->
+<section id="n1">
+  <p class="ts">― 通信ノイズ ―</p>
+  <p class="small">別の被験者の記録が、混線しています。これはKの記録ではありません。</p>
+  <div class="grid">
+    <div>🍓</div><div>🥛🥛🥛</div><div>🍮</div>
+    <div>🥝</div><div>🍑</div><div>🥚</div>
+    <div>🧈</div><div>🍇🍇</div><div>🥒</div>
+  </div>
+  <p class="small">……ノイズは、記憶に残ります。それも含めて、観測です。</p>
+  <div class="choices">
+    <button class="primary" onclick="go('day3')">Kの記録に戻る</button>
   </div>
 </section>
 
 <!-- Day3：齟齬1 -->
 <section id="day3">
   <p class="ts">DAY 3 ― 07:58　観測</p>
-  <div class="grid">
+  <div id="g-day3"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
-  </div>
+  </div></div>
   <p>変化を確認：🍐が1つ減り、🍇が1つ増えた。<br>この日の購入記録は「🥫と🥛」だけです。</p>
   <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
   <div class="choices">
@@ -196,18 +208,18 @@
   </div>
   <p class="reaction" id="check1Msg"></p>
   <div class="choices">
-    <button class="primary hidden" id="toDay4" onclick="go('day4')">Day 4 へ</button>
+    <button class="primary hidden" id="toDay4" onclick="advance('day4','g-day3')">Day 4 へ</button>
   </div>
 </section>
 
 <!-- Day4 -->
 <section id="day4">
   <p class="ts">DAY 4 ― 20:17　観測</p>
-  <div class="grid">
+  <div id="g-day4"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
-  </div>
+  </div></div>
   <p id="day4food">ドアポケットの記録にも、変化があった。</p>
   <div class="log">
     <p class="q">観測者：卵が、増えています。</p>
@@ -221,18 +233,18 @@
   </div>
   <p class="reaction" id="check2Msg"></p>
   <div class="choices">
-    <button class="primary hidden" id="toDay5" onclick="go('day5')">Day 5 へ</button>
+    <button class="primary hidden" id="toDay5" onclick="advance('day5','g-day4')">Day 5 へ</button>
   </div>
 </section>
 
 <!-- Day5：齟齬2 -->
 <section id="day5">
   <p class="ts">DAY 5 ― 08:11　観測</p>
-  <div class="grid">
+  <div id="g-day5"><div class="grid">
     <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
-  </div>
+  </div></div>
   <p>昨日、廃棄の申告があった🥦が、同じ位置にある。</p>
   <p><strong>観測者への確認：この記録を、どう所見しますか？</strong></p>
   <div class="choices">
@@ -241,7 +253,22 @@
   </div>
   <p class="reaction" id="check3Msg"></p>
   <div class="choices">
-    <button class="primary hidden" id="toDay6" onclick="go('day6')">Day 6 へ</button>
+    <button class="primary hidden" id="toDay6" onclick="advance('n2','g-day5')">Day 6 へ</button>
+  </div>
+</section>
+
+
+<!-- ノイズ2：研究所からの通知 -->
+<section id="n2">
+  <p class="ts">― 研究所からの通知 ―</p>
+  <div class="log">
+    <p>観測者の皆さまへ。記録の照合は、記憶ではなく、報告に基づいて行われます。</p>
+    <p>遡っての再表示は、仕様上、行われません。</p>
+    <p>引き続き、観測をお願いいたします。</p>
+  </div>
+  <p class="big">▓▒░ ▒▓░▒ ▓▒</p>
+  <div class="choices">
+    <button class="primary" onclick="go('day6')">Kの記録に戻る</button>
   </div>
 </section>
 
@@ -290,6 +317,17 @@
   <h2 id="endingTitle"></h2>
   <div class="log" id="endingLog"></div>
   <p id="endingLine"></p>
+  <div class="choices">
+    <button class="primary" onclick="go('s-result')">あなたの観測結果を見る</button>
+  </div>
+</section>
+
+<!-- リザルト -->
+<section id="s-result">
+  <p class="ts">OBSERVATION RESULT</p>
+  <h2>あなたの観測結果</h2>
+  <div class="log" id="resultLog"></div>
+  <p id="resultTotal"></p>
   <div class="choices">
     <button class="primary" onclick="go('s-final')">最後の記録へ</button>
   </div>
@@ -354,14 +392,23 @@ function confirmFood() {
   go('day1');
 }
 
+/* 進行：過ぎた記録は再表示されない */
+function advance(target, eraseId) {
+  if (eraseId) {
+    const el = document.getElementById(eraseId);
+    if (el) el.innerHTML = '<p class="small">（この記録は照合済みです。再表示はされません）</p>';
+  }
+  go(target);
+}
+
 /* 練習 */
 function showPractice2() { go('s-practice2'); }
 function answerPractice(ok, btn) {
   btn.closest('.choices').querySelectorAll('button').forEach(b => { b.disabled = true; });
   btn.classList.add('picked'); btn.disabled = false;
   document.getElementById('practiceMsg').innerHTML = ok
-    ? '正解です。買っていない🍇が、ある。これが「齟齬」です。<br>本番では、こういうズレが3回出ます。報告するか、異常なしとするかは、あなたの判断です。正誤は、その場では示しません。'
-    : 'ズレは、ありました。買っていない🍇が、増えています。<br>本番では、こういうズレが3回出ます。報告するか、異常なしとするかは、あなたの判断です。正誤は、その場では示しません。';
+    ? '正解です。買っていない🍇が、ある。これが「齟齬」です。<br>本番では、こういうズレが3回出ます。報告するか、異常なしとするかは、あなたの判断です。'
+    : 'ズレは、ありました。買っていない🍇が、増えています。<br>本番では、こういうズレが3回出ます。報告するか、異常なしとするかは、あなたの判断です。';
   const next = document.getElementById('toPrecheck');
   next.classList.remove('hidden');
   setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
@@ -377,7 +424,7 @@ function toggleSound() {
     actx = new AC();
     const g = actx.createGain(); g.gain.value = 0.0; g.connect(actx.destination);
     const o1 = actx.createOscillator(); o1.type = 'sine'; o1.frequency.value = 55;
-    const og1 = actx.createGain(); og1.gain.value = 0.5; o1.connect(og1); og1.connect(g);
+    const og1 = actx.createGain(); og1.gain.value = 0.7; o1.connect(og1); og1.connect(g);
     const o2 = actx.createOscillator(); o2.type = 'sine'; o2.frequency.value = 110;
     const og2 = actx.createGain(); og2.gain.value = 0.12; o2.connect(og2); og2.connect(g);
     const len = actx.sampleRate * 2;
@@ -386,7 +433,7 @@ function toggleSound() {
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     const noise = actx.createBufferSource(); noise.buffer = buf; noise.loop = true;
     const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 320;
-    const ng = actx.createGain(); ng.gain.value = 0.06;
+    const ng = actx.createGain(); ng.gain.value = 0.1;
     noise.connect(f); f.connect(ng); ng.connect(g);
     o1.start(); o2.start(); noise.start();
     soundNodes = { g };
@@ -396,7 +443,7 @@ function toggleSound() {
     btn.textContent = '🔇 音：オフ';
   } else {
     actx.resume();
-    soundNodes.g.gain.linearRampToValueAtTime(0.05, actx.currentTime + 0.6);
+    soundNodes.g.gain.linearRampToValueAtTime(0.1, actx.currentTime + 0.6);
     btn.textContent = '🔊 音：オン';
   }
 }
@@ -410,8 +457,8 @@ function answerCheck(n, noticed, btn) {
   sec.querySelectorAll('.choices button').forEach(b => { if (!b.id) b.disabled = true; });
   btn.classList.add('picked'); btn.disabled = false;
   document.getElementById('check' + n + 'Msg').textContent = noticed
-    ? '報告を受け付けました。正誤は、ここでは示しません。'
-    : '異常なしとして、処理しました。正誤は、ここでは示しません。';
+    ? '報告を受け付けました。'
+    : '異常なしとして、処理しました。';
   const next = document.getElementById('toDay' + (n + 3));
   next.classList.remove('hidden');
   setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
@@ -453,6 +500,13 @@ function showEnding() {
       '<p>記録は、封印される。</p>';
     line.textContent = '……ただ、最後の1行が、追加されています。';
   }
+  const rows = [1, 2, 3].map(n =>
+    '<p>' + CHECK_NAMES[n] + '：' + (state.noticed[n] ? '見抜けました' : '見抜けませんでした') + '（原因：本人の忘却）</p>').join('');
+  document.getElementById('resultLog').innerHTML = rows +
+    '<p>Kの証言の矛盾：所見を求められなかった項目（本人の記憶が、書き換わっていました）</p>';
+  document.getElementById('resultTotal').textContent =
+    '見抜けた齟齬：' + state.score + ' / 3' +
+    (state.score === 3 ? ' ― 全部、見抜けました。' : state.score === 0 ? ' ― 全部、記録に流されました。' : ' ― 見抜けたものと、流されたものがありました。');
   const h = load(KEY) || { plays: 0 };
   save(KEY, {
     plays: (h.plays || 0) + 1,
