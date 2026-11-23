@@ -86,6 +86,15 @@
   .doc.receipt-doc { background: #f7f5ef; color: #222; font-family: ui-monospace, Menlo, monospace; border: none; }
   .doc.receipt-doc .dlabel { color: #666; }
   .fridgebox { display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(92vw, 480px); }
+  .corridor { min-height: 230svh; justify-content: flex-start; padding-top: 16svh; gap: 55svh; }
+  .glimpse { opacity: .38; filter: blur(1.2px); }
+  .stamp {
+    display: inline-block; border: 2px solid currentColor; border-radius: 4px;
+    padding: 4px 12px; transform: rotate(-3deg);
+    font-family: ui-monospace, Menlo, monospace; font-size: 14px;
+  }
+  .stamp-red { color: #e06666; }
+  .stamp-gray { color: #888; }
 </style>
 </head>
 <body>
@@ -95,6 +104,7 @@
   <p class="ts"><span class="rec">● REC</span>　ARCHIVE No. K-07</p>
   <h1>観測記録K</h1>
   <p>被験者Kの冷蔵庫 ― 定点観測記録</p>
+  <p class="big">誰もいないのに、増えている。</p>
   <div class="log">
     <p>観測機関：生活記録観測所</p>
     <p>目的：一人暮らしの食料保管の実態を、記録すること。</p>
@@ -149,7 +159,7 @@
 <section id="s1">
   <p class="ts">PRE-CHECK</p>
   <h2>記録の照合のため、1つ教えてください。</h2>
-  <p>あなたが、つい余らせてしまう食材はどれですか？</p>
+  <p>あなたの冷蔵庫で、いちばん長く残っているものは、どれですか？</p>
   <div class="palette" id="palette">
     <button data-food="🍌" aria-label="バナナ">🍌</button>
     <button data-food="🥦" aria-label="ブロッコリー">🥦</button>
@@ -184,19 +194,20 @@
   </div>
   <div id="post-day1" class="hidden">
     <div class="choices">
-      <button class="primary" onclick="go('gate1')">Day 1 の記録を閉じる</button>
+      <button class="primary" onclick="transit('day2','g-day1')">Day 1 の記録を閉じる</button>
     </div>
   </div>
 </section>
 
 
-<section id="gate1">
-  <p class="ts">― 記録を閉じます ―</p>
-  <p>ここでは、スクロールしないでください。</p>
-  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
-  <div class="choices">
-    <button class="primary" onclick="advance('day2','g-day1')">Day 2 を開く</button>
+<section id="corr1" class="corridor">
+  <p class="ts glimpse">記録を、送付しています</p>
+  <div class="grid glimpse">
+    <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
+    <div>🍌</div><div>🥩</div><div>🍐🍐</div>
   </div>
+  <p class="small glimpse">照合：完了</p>
 </section>
 
 <!-- Day2 -->
@@ -223,43 +234,30 @@
   <div id="post-day2" class="hidden">
     <p>観測メモ：🥩と🥛1本の減少は、申告と一致。異常なし。</p>
     <div class="choices">
-      <button class="primary" onclick="go('gate2')">Day 2 の記録を閉じる</button>
+      <button class="primary" onclick="transit('day3','g-day2')">Day 2 の記録を閉じる</button>
     </div>
   </div>
 </section>
 
 
 
-<section id="gate2">
-  <p class="ts">― 記録を閉じます ―</p>
-  <p>ここでは、スクロールしないでください。</p>
-  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
-  <div class="choices">
-    <button class="primary" onclick="advance('n1','g-day2')">Day 3 を開く</button>
-  </div>
-</section>
-
-<!-- ノイズ1：他被験者の記録 -->
-<section id="n1">
-  <p class="ts">― 通信ノイズ ―</p>
-  <p class="small">別の被験者の記録が、混線しています。これはKの記録ではありません。</p>
-  <div class="grid">
+<section id="corr2" class="corridor">
+  <p class="small glimpse">……</p>
+  <div class="grid glimpse">
     <div>🍓</div><div>🥛🥛🥛</div><div>🍮</div>
     <div>🥝</div><div>🍑</div><div>🥚</div>
-    <div>🧈</div><div>🍇🍇</div><div>🥒</div>
+    <div>🧈</div><div id="corrFoodCell">🍇🍇</div><div>🥒</div>
   </div>
-  <p class="small">……ノイズは、記憶に残ります。それも含めて、観測です。</p>
-  <div class="choices">
-    <button class="primary" onclick="go('day3')">Kの記録に戻る</button>
-  </div>
+  <p class="small glimpse">……</p>
 </section>
+
 
 <!-- Day3：齟齬1 -->
 <section id="day3">
   <p class="ts">DAY 3 ― 07:58　観測</p>
   <div class="doc receipt-doc">
     <p class="dlabel">【資料1】購入記録（レシート）</p>
-    <p>🥫 ×1<br>🥛 ×1</p>
+    <p>🥫 ×1<br>🥛 ×1<br>※🥫は、棚で保管</p>
   </div>
   <div class="doc">
     <p class="dlabel">【資料2】本人の申告（食べたもの）</p>
@@ -268,7 +266,7 @@
   <div class="fridgebox">
     <button class="primary" id="open-day3" onclick="openFridge('day3')">冷蔵庫を開ける</button>
     <div id="g-day3" class="hidden"><div class="grid">
-    <div>🥛</div><div>🥚🥚🥚</div><div>🧀</div>
+    <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
@@ -283,20 +281,20 @@
       <button onclick="answerCheck(1,true,this)">齟齬として報告する</button>
     </div>
     <p class="reaction" id="check1Msg"></p>
+    <p class="stamp hidden" id="stamp1"></p>
     <div class="choices">
-      <button class="primary hidden" id="toDay4" onclick="go('gate3')">Day 3 の記録を閉じる</button>
+      <button class="primary hidden" id="toDay4" onclick="transit('day4','g-day3')">Day 3 の記録を閉じる</button>
     </div>
   </div>
 </section>
 
 
-<section id="gate3">
-  <p class="ts">― 記録を閉じます ―</p>
-  <p>ここでは、スクロールしないでください。</p>
-  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
-  <div class="choices">
-    <button class="primary" onclick="advance('day4','g-day3')">Day 4 を開く</button>
+<section id="corr3" class="corridor">
+  <p class="ts glimpse">記録を、送付しています</p>
+  <div class="doc receipt-doc glimpse">
+    <p>🥚 ×1<br>🧀 ×1<br>（以下、かすれて読めない）</p>
   </div>
+  <p class="small glimpse">照合：完了</p>
 </section>
 
 <!-- Day4 -->
@@ -313,7 +311,7 @@
   <div class="fridgebox">
     <button class="primary" id="open-day4" onclick="openFridge('day4')">冷蔵庫を開ける</button>
     <div id="g-day4" class="hidden"><div class="grid">
-    <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
+    <div>🥛🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
@@ -328,20 +326,18 @@
       <button onclick="answerCheck(2,true,this)">齟齬として報告する</button>
     </div>
     <p class="reaction" id="check2Msg"></p>
+    <p class="stamp hidden" id="stamp2"></p>
     <div class="choices">
-      <button class="primary hidden" id="toDay5" onclick="go('gate4')">Day 4 の記録を閉じる</button>
+      <button class="primary hidden" id="toDay5" onclick="transit('day5','g-day4')">Day 4 の記録を閉じる</button>
     </div>
   </div>
 </section>
 
 
-<section id="gate4">
-  <p class="ts">― 記録を閉じます ―</p>
-  <p>ここでは、スクロールしないでください。</p>
-  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
-  <div class="choices">
-    <button class="primary" onclick="advance('day5','g-day4')">Day 5 を開く</button>
-  </div>
+<section id="corr4" class="corridor">
+  <p class="ts glimpse">廃棄記録を、照合しています</p>
+  <p class="big glimpse">🥦</p>
+  <p class="small glimpse">照合：完了</p>
 </section>
 
 <!-- Day5：齟齬2 -->
@@ -358,7 +354,7 @@
   <div class="fridgebox">
     <button class="primary" id="open-day5" onclick="openFridge('day5')">冷蔵庫を開ける</button>
     <div id="g-day5" class="hidden"><div class="grid">
-    <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
+    <div>🥛🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
@@ -373,36 +369,25 @@
       <button onclick="answerCheck(3,true,this)">齟齬として報告する</button>
     </div>
     <p class="reaction" id="check3Msg"></p>
+    <p class="stamp hidden" id="stamp3"></p>
     <div class="choices">
-      <button class="primary hidden" id="toDay6" onclick="go('gate5')">Day 5 の記録を閉じる</button>
+      <button class="primary hidden" id="toDay6" onclick="transit('day6','g-day5')">Day 5 の記録を閉じる</button>
     </div>
   </div>
 </section>
 
 
 
-<section id="gate5">
-  <p class="ts">― 記録を閉じます ―</p>
-  <p>ここでは、スクロールしないでください。</p>
-  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
-  <div class="choices">
-    <button class="primary" onclick="advance('n2','g-day5')">Day 6 を開く</button>
+<section id="corr5" class="corridor">
+  <p class="small glimpse">……</p>
+  <div class="grid glimpse">
+    <div>🍎</div><div>🍞</div><div>🥛</div>
+    <div>🥚🥚</div><div>🍙</div><div>🍋</div>
+    <div>🧈</div><div>🍇</div><div>🥒</div>
   </div>
+  <p class="ts glimpse">25:13</p>
 </section>
 
-<!-- ノイズ2：研究所からの通知 -->
-<section id="n2">
-  <p class="ts">― 研究所からの通知 ―</p>
-  <div class="log">
-    <p>観測者の皆さまへ。記録の照合は、記憶ではなく、報告に基づいて行われます。</p>
-    <p>遡っての再表示は、仕様上、行われません。</p>
-    <p>引き続き、観測をお願いいたします。</p>
-  </div>
-  <p class="big">▓▒░ ▒▓░▒ ▓▒</p>
-  <div class="choices">
-    <button class="primary" onclick="go('day6')">Kの記録に戻る</button>
-  </div>
-</section>
 
 <!-- Day6：齟齬3 -->
 <section id="day6">
@@ -415,7 +400,7 @@
   <div class="fridgebox">
     <button class="primary" id="open-day6" onclick="openFridge('day6')">冷蔵庫を開ける</button>
     <div id="g-day6" class="hidden"><div class="grid">
-    <div>🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
+    <div>🥛🥛</div><div>🥚🥚🥚🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
@@ -426,19 +411,14 @@
     <p id="day6food"></p>
     <p>観測メモ：記録と、証言が、食い違っています。……この件の所見は、求められていません。</p>
     <div class="choices">
-      <button class="primary" onclick="go('gate6')">Day 6 の記録を閉じる</button>
+      <button class="primary" onclick="transit('day7',null)">Day 6 の記録を閉じる</button>
     </div>
   </div>
 </section>
 
 
-<section id="gate6">
-  <p class="ts">― 記録を閉じます ―</p>
-  <p>ここでは、スクロールしないでください。</p>
-  <p class="small">下のボタンで進んでください。進むと、前の記録は再表示されません。</p>
-  <div class="choices">
-    <button class="primary" onclick="go('day7')">Day 7 を開く</button>
-  </div>
+<section id="corr6" class="corridor">
+  <p class="small glimpse">最終記録を、開きます</p>
 </section>
 
 <!-- Day7 -->
@@ -448,10 +428,14 @@
     <p class="dlabel">【資料】廃棄記録（観測期間中）</p>
     <div id="wasteLog">
       <p>🥚 ×3（6個のうち3個が、期限切れ）</p>
+      <p class="small">🥚「まだ3つ残っていたのに、特売で、もう1パック買われました。古い方から、期限が切れました」</p>
       <p id="wasteFood">余らせた食材 ×1</p>
+      <p class="small" id="wasteFoodVoice"></p>
       <p>🥦 ×1（捨てたつもりで残っていたもの。最終日に廃棄）</p>
+      <p class="small">🥦「少し状態が悪くなったので、捨てられたと思っていました。――捨てられていませんでした」</p>
       <p>🍇 ×1（出所の記録がないまま、期限切れ）</p>
       <p>合計：約 🪙×4（約400円）　※🪙＝100円として換算</p>
+      <p>特売で浮いた分：約80円／捨てた分：約400円 ― 差し引き、損をしています</p>
     </div>
   </div>
   <p>冷蔵庫は、片付いていました。</p>
@@ -506,6 +490,7 @@
     <p class="psub">◉ 観測に同意します</p>
     <p class="sign">観測者　あなた</p>
     <p class="psub" id="rDate"></p>
+    <p class="psub">超常現象は、ない。あるのは、冷蔵庫と、嘘をつく記憶だけ</p>
   </div>
   <p id="resultTotal"></p>
   <div class="choices">
@@ -518,7 +503,7 @@
 <!-- 最後の記録 -->
 <section id="s-final">
   <p class="ts" id="finalDate"></p>
-  <p id="finalLine">記録と記憶がずれるのなら、記憶ではなく、記録を見る。<br>行動は、1つだけです。</p>
+  <p id="finalLine">見ていないものは、無いのと同じだ。<br>行動は、1つだけです。</p>
   <p class="big"><strong>買い物に行く前に、<br>冷蔵庫の写真を1枚撮る。</strong></p>
   <div class="choices">
     <button class="primary" onclick="shareRecord()">この記録をシェアする</button>
@@ -571,20 +556,53 @@ function confirmFood() {
   document.getElementById('day6food').textContent =
     state.food + ' は、傷み始めていた。記録には「まだ食べられる」とある。';
   document.getElementById('wasteFood').textContent = state.food + ' ×1（増えた分の1つが、期限切れ）';
+  document.getElementById('wasteFoodVoice').textContent = state.food + '「安かったので、余分に買われました」';
+  const cfc = document.getElementById('corrFoodCell');
+  if (cfc) cfc.textContent = state.food + state.food;
   go('day1');
 }
 
-/* 進行：過ぎた記録は再表示されない */
-function advance(target, eraseId) {
+/* 進行：回廊を自動スクロールして次へ（過ぎた記録は再表示されない） */
+let transitAnim = null;
+function transit(nextId, eraseId) {
   if (eraseId) {
     const el = document.getElementById(eraseId);
     if (el) el.innerHTML = '<p class="small">（この記録は照合済みです。再表示はされません）</p>';
   }
-  go(target);
+  const target = document.getElementById(nextId);
+  if (!target) return;
+  const startY = window.scrollY;
+  const endY = target.getBoundingClientRect().top + window.scrollY;
+  const dur = 2400;
+  const t0 = performance.now();
+  if (transitAnim) cancelAnimationFrame(transitAnim);
+  const step = (t) => {
+    const p = Math.min(1, (t - t0) / dur);
+    const e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    window.scrollTo(0, startY + (endY - startY) * e);
+    if (p < 1) transitAnim = requestAnimationFrame(step);
+    else transitAnim = null;
+  };
+  transitAnim = requestAnimationFrame(step);
 }
+['wheel', 'touchstart'].forEach(ev => window.addEventListener(ev, () => {
+  if (transitAnim) { cancelAnimationFrame(transitAnim); transitAnim = null; }
+}, { passive: true }));
 
 /* 冷蔵庫の開閉 */
 function openFridge(n) {
+  if (actx && soundNodes && soundNodes.g.gain.value > 0) {
+    const f = (n === 'day3' || n === 'day4' || n === 'day5') ? 50 : 55;
+    soundNodes.o1.frequency.linearRampToValueAtTime(f, actx.currentTime + 0.3);
+    if (n === 'day6') {
+      soundNodes.g.gain.linearRampToValueAtTime(0.02, actx.currentTime + 0.15);
+      setTimeout(() => {
+        if (soundNodes && soundNodes.g.gain.value < 0.1) {
+          soundNodes.g.gain.linearRampToValueAtTime(0.2, actx.currentTime + 0.5);
+        }
+      }, 1300);
+    }
+  }
   document.getElementById('open-' + n).classList.add('hidden');
   document.getElementById('g-' + n).classList.remove('hidden');
   document.getElementById('close-' + n).classList.remove('hidden');
@@ -636,14 +654,14 @@ function toggleSound() {
     const ng = actx.createGain(); ng.gain.value = 0.1;
     noise.connect(f); f.connect(ng); ng.connect(g);
     o1.start(); o2.start(); noise.start();
-    soundNodes = { g };
+    soundNodes = { g, o1 };
   }
   if (actx.state === 'running' && soundNodes.g.gain.value > 0) {
     soundNodes.g.gain.linearRampToValueAtTime(0.0, actx.currentTime + 0.4);
     btn.textContent = '🔇 音：オフ';
   } else {
     actx.resume();
-    soundNodes.g.gain.linearRampToValueAtTime(0.1, actx.currentTime + 0.6);
+    soundNodes.g.gain.linearRampToValueAtTime(0.2, actx.currentTime + 0.6);
     btn.textContent = '🔊 音：オン';
   }
 }
@@ -659,6 +677,12 @@ function answerCheck(n, noticed, btn) {
   document.getElementById('check' + n + 'Msg').textContent = noticed
     ? '報告を受け付けました。'
     : '異常なしとして、処理しました。';
+  const st = document.getElementById('stamp' + n);
+  if (st) {
+    st.classList.remove('hidden');
+    if (noticed) { st.textContent = '観測者所見 ― 齟齬として報告済み'; st.classList.add('stamp-red'); }
+    else { st.textContent = '観測者所見 ― 異常なしとして処理（未照合）'; st.classList.add('stamp-gray'); }
+  }
   const next = document.getElementById('toDay' + (n + 3));
   next.classList.remove('hidden');
   setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
@@ -678,26 +702,30 @@ function showEnding() {
   if (state.score === 3) {
     title.textContent = '結末A「観測者」';
     log.innerHTML =
-      '<p>種明かしを、開示します。</p>' +
-      '<p>🍇：特売で買っていた。本人に、買った自覚がなかった。</p>' +
-      '<p>🥚の増加：不安になって、買い足していた。そしてDay6、Kは「最初から6個」と言った。本人の記憶の方が、書き換わっていたのです。</p>' +
-      '<p>🥦の回帰：捨てたつもりで、捨てていなかった。</p>' +
-      '<p>幽霊は、いません。全部、「見ていなかった」ことが原因でした。</p>' + reveal +
-      '<p>そして、もう1つ。Kは仮名です。この記録の買い物パターンは、あなたの回答（' + state.food + '）をもとに組まれています。観測していたつもりで、観測されていたのです。</p>';
-    line.textContent = 'あなたは、異変の全部に気づけました。現実でも、写真があれば、気づける側に回れます。';
+      '<p>照合表 ― 記録と、申告。</p>' +
+      '<p>🍇｜記録：Day 2のレシートに、購入行（特売）あり｜申告：「買っていない」</p>' +
+      '<p>🥚｜記録：Day 4に、購入記録なし｜証言：「最初から、6個」</p>' +
+      '<p>🥦｜記録：廃棄の実行記録、なし｜申告：「捨てた」</p>' +
+      '<p>被験者K ― 登録票（抜粋）：買い物パターンの出典 …… 観測者の回答（' + state.food + '）</p>' + reveal;
+    line.textContent = '幽霊は、いませんでした。怪異の正体は、忘れていく自分だった。';
   } else if (state.score >= 1) {
     title.textContent = '結末B「半分だけ見ていた」';
-    const rows = [1, 2, 3].map(n => state.noticed[n]
-      ? '<p>' + CHECK_NAMES[n] + '：報告済み。原因は、本人の忘却でした。</p>'
-      : '<p>' + CHECK_NAMES[n] + '：原因は、伏せられています。</p>').join('');
-    log.innerHTML = rows + reveal +
-      '<p>Kは仮名です。この記録の買い物パターンは、あなたの回答（' + state.food + '）をもとに組まれています。その一部は、まだ伏せたままです。</p>';
+    const TBL = {
+      1: '<p>🍇｜記録：Day 2のレシートに、購入行（特売）あり｜申告：「買っていない」</p>',
+      2: '<p>🥚｜記録：Day 4に、購入記録なし｜証言：「最初から、6個」</p>',
+      3: '<p>🥦｜記録：廃棄の実行記録、なし｜申告：「捨てた」</p>'
+    };
+    const rows = [1, 2, 3].map(n => state.noticed[n] ? TBL[n]
+      : '<p>' + CHECK_NAMES[n] + '：照合、未実施</p>').join('');
+    log.innerHTML = '<p>照合表 ― 記録と、申告。</p>' + rows +
+      '<p>被験者K ― 登録票（抜粋）：買い物パターンの出典 …… 一部、伏せられています</p>' + reveal;
     line.textContent = '見落とした分は、あなたの冷蔵庫でも起きています。';
   } else {
     title.textContent = '結末C「原因不明」';
     log.innerHTML =
       '<p>本観測は、原因不明のまま終了する。</p>' +
-      '<p>記録は、封印される。</p>';
+      '<p>記録は、封印される。</p>' +
+      '<p>封印前に、1枚だけ差し込まれていた。被験者K ― 登録票（抜粋）：買い物パターンの出典 …… 観測者の回答（' + state.food + '）</p>';
     line.textContent = '……ただ、最後の1行が、追加されています。';
   }
   const KANJI = ['零', '一', '二', '三'];
