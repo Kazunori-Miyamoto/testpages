@@ -71,11 +71,11 @@
 <body>
 
 <div id="photoOverlay">
-  <p>📸 あなたの写真（1秒だけ）</p>
+  <p>📸 あなたの写真（2秒だけ）</p>
   <div class="grid">
     <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
-    <div>🍌</div><div>🥩</div><div>🍎🍎</div>
+    <div>🍌</div><div>🥩</div><div>🍐🍐</div>
   </div>
 </div>
 
@@ -164,7 +164,7 @@
     <div class="grid" id="fridgeGrid">
       <div>🥛🥛</div><div>🥚🥚🥚</div><div>🧀</div>
       <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
-      <div>🍌</div><div>🥩</div><div>🍎🍎</div>
+      <div>🍌</div><div>🥩</div><div>🍐🍐</div>
     </div>
   </div>
   <p id="fridgeMsg">……覚えましたか？</p>
@@ -246,8 +246,8 @@
   <p>……確認です。</p>
   <h2>さっき、あなたは言いましたよね。<br>「チーズは、家に無い」って。</h2>
   <div class="choices">
-    <button onclick="answerMisquote(true,this)">言った気がする</button>
-    <button onclick="answerMisquote(false,this)">言ってない。チーズは、あった</button>
+    <button onclick="answerMisquote(true,this)">言った</button>
+    <button onclick="answerMisquote(false,this)">言ってない</button>
   </div>
   <p class="reaction" id="misquoteResult"></p>
 </section>
@@ -277,10 +277,10 @@
 <section id="s-three">
   <div id="timer3">3</div>
   <div class="face">😄</div>
-  <h2>冷蔵庫に、牛乳は何本あった？</h2>
+  <h2>冷蔵庫に、卵は何個あった？</h2>
   <div class="choices">
-    <button onclick="answerThree('one',this)">🥛 1本</button>
-    <button onclick="answerThree('two',this)">🥛🥛 2本</button>
+    <button onclick="answerThree('six',this)">🥚🥚🥚🥚🥚🥚 6個</button>
+    <button onclick="answerThree('three',this)">🥚🥚🥚 3個</button>
   </div>
 </section>
 
@@ -506,7 +506,7 @@ function openFridge() {
 function choosePhoto(take) {
   state.photoTaken = take;
   document.getElementById('photoMsg').textContent = take
-    ? '📸 撮りました。買い物の途中、1回だけ・1秒だけ見返せます。'
+    ? '📸 撮りました。買い物の途中、1回だけ・2秒だけ見返せます。'
     : '分かりました。あなたの記憶だけで、買い物をしてください。';
   if (take) document.querySelectorAll('.photoBtn').forEach(b => b.classList.remove('hidden'));
   setTimeout(() => go('q1'), 1100);
@@ -517,7 +517,7 @@ function showPhoto(btn) {
   document.querySelectorAll('.photoBtn').forEach(b => { b.textContent = '📸 写真は、もう見返せません'; b.disabled = true; });
   const ov = document.getElementById('photoOverlay');
   ov.style.display = 'flex';
-  setTimeout(() => { ov.style.display = 'none'; }, 1000);
+  setTimeout(() => { ov.style.display = 'none'; }, 2000);
 }
 
 /* 買い物 */
@@ -562,14 +562,14 @@ function answerSimilar(choice, btn) {
   if (!ok) { state.pollution += 1; state.traps.push('似た物'); }
   document.getElementById('similarResult').textContent = ok
     ? '🙂 トマトでした。アナウンスに、揺らされませんでした。'
-    : '😵‍💫 家にあったのは、トマトでした。アナウンスの🍎が、記憶に混ざりました。';
+    : '🌀 家にあったのは、トマトでした。アナウンスの🍎が、記憶に混ざりました。';
   setTimeout(() => go('q3'), 1300);
 }
 function answerMisquote(said, btn) {
   lockChoices(btn);
   if (said) { state.pollution += 1; state.traps.push('言い換え'); }
   document.getElementById('misquoteResult').textContent = said
-    ? '😵‍💫 あなたは、言っていません。チーズは、最初から冷蔵庫にありました。'
+    ? '😶 あなたは、言っていません。チーズは、最初から冷蔵庫にありました。'
     : '🙂 その通り。言っていません。チーズは、最初からありました。';
   setTimeout(() => {
     if (state.answers[2] === 'buy' && state.answers[3] === 'buy') {
@@ -604,12 +604,12 @@ function answerThree(choice, btn) {
   setTimeout(finishThree, 200);
 }
 function finishThree() {
-  const ok = state.three === 'two';
+  const ok = state.three === 'three';
   document.getElementById('threeFace').textContent = ok ? '🙂' : '😵‍💫';
   document.getElementById('threeText').innerHTML =
-    '最初に見たとき：🥛🥛 2本<br>' +
+    '最初に見たとき：🥚🥚🥚 3個<br>' +
     (ok ? '3秒でも、思い出せました。<br>現実のレジでも、思い出せますか？'
-        : '3秒では、思い出せませんでした。<br>見たはずの記憶が、売り場で書き換わっていました。');
+        : '3秒では、思い出せませんでした。<br>売り場の「6個入り」が、あなたの記憶に混ざっていました。');
   go('s-three-result');
 }
 
@@ -617,7 +617,7 @@ function finishThree() {
 function showReceipt() {
   const items = basketItems();
   const lines = items.length ? items.slice() : ['（何も買わなかった）'];
-  lines.push('🍇');
+  lines.push('🧻', '🍇', '🍙', '🥫');
   document.getElementById('receiptBody').innerHTML = lines.join('<br>');
   if (state.answers[2] === 'buy') document.getElementById('homeEggs').textContent = '🥚🥚🥚🥚🥚🥚';
   go('s-receipt');
@@ -658,7 +658,7 @@ function buildWeek() {
     const coins = coinCount();
     document.getElementById('weekCoins').textContent = '🗑️ ' + '🪙'.repeat(coins);
     document.getElementById('weekYear').textContent =
-      '今週は 🪙×' + coins + '（約' + (coins * 100) + '円）。毎週繰り返せば、1年で約' +
+      '今週は 🪙×' + coins + '（約' + (coins * 100) + '円）。この買い方を毎週続けたら、1年で約' +
       (coins * 100 * 52).toLocaleString() + '円分が、ゴミ箱へ。';
   } else if (state.answers[1] === 'skip') {
     document.getElementById('weekText').textContent =
@@ -671,10 +671,19 @@ function buildWeek() {
 }
 
 /* 結末とルール */
+const TRAP_PRIORITY = ['特売', '安さ', '偽の記憶', '言い換え', '似た物', '買い忘れ'];
+function mainTrap() {
+  return TRAP_PRIORITY.find(t => state.traps.includes(t)) || null;
+}
 function showEnding() {
   let line;
   if (state.pollution === 0) line = '売り場でも、レシートでも、記憶は守れました。';
-  else if (state.pollution <= 3) line = 'あなたが弱いんじゃない。' + (state.traps[0] || '') + 'が、あなたの記憶より速かった。';
+  else if (state.pollution <= 3) {
+    const mt = mainTrap();
+    line = (mt === '買い忘れ')
+      ? '捨てはしなかった。でも、買うべきものも、記憶に残らなかった。'
+      : 'あなたが弱いんじゃない。' + (mt || '') + 'が、あなたの記憶より速かった。';
+  }
   else line = '最初に見た冷蔵庫は、もうどこにもありません。あなたの記憶の中の冷蔵庫は、売り場が作ったものです。';
   document.getElementById('endingLine').textContent = line;
   const h = loadHistory();
@@ -682,7 +691,7 @@ function showEnding() {
     const same = state.traps.find(t => h.lastTraps.includes(t));
     document.getElementById('repeatLine').textContent = '前回も、同じ「' + same + '」でしたね。';
   }
-  const key = state.traps[0] && RULES[state.traps[0]] ? state.traps[0] : 'default';
+  const key = mainTrap() && RULES[mainTrap()] ? mainTrap() : 'default';
   const wrap = document.getElementById('ruleChoices');
   wrap.innerHTML = '';
   RULES[key].forEach(r => {
@@ -708,9 +717,12 @@ function cardLines() {
   return [
     '冷蔵庫の記憶テスト',
     '余らせたもの：' + (w.length ? w.join(' ') + ' 🥀' : 'なし 🍽️'),
-    '捨てた金額：' + (coins ? '🪙'.repeat(coins) + '（約' + (coins * 100) + '円／1年で約' + (coins * 100 * 52).toLocaleString() + '円）' : '🪙 0'),
-    '落ちた罠：' + (state.traps.length ? state.traps.join('・') : 'なし'),
-    '3秒の問い：' + (state.three === 'two' ? '思い出せた' : '書き換わっていた'),
+    '捨てた金額：' + (coins ? '🪙'.repeat(coins) + '（約' + (coins * 100) + '円／続けたら1年で約' + (coins * 100 * 52).toLocaleString() + '円）' : '🪙 0'),
+    '落ちた罠：' + (state.traps.length
+      ? TRAP_PRIORITY.filter(t => state.traps.includes(t)).slice(0, 2).join('・') +
+        (state.traps.length > 2 ? '・ほか' + (state.traps.length - 2) + 'つ' : '')
+      : 'なし'),
+    '3秒の問い：' + (state.three === 'three' ? '思い出せた' : '書き換わっていた'),
     'レシートの🍇：' + (state.noticedGrape ? '気づいた' : '気づかなかった'),
     '写真：' + (state.photoTaken ? (state.photoUsed ? '撮って、1回見返した' : '撮ったが見返さなかった') : '撮らなかった'),
     'あなたのルール：「' + state.rule + '」',
@@ -763,6 +775,7 @@ function shareCard() {
     navigator.clipboard.writeText(text + ' ' + url).then(() => alert('リンクをコピーしました'));
   }
 }
+renderBaskets();
 function resetHistory() {
   try { localStorage.removeItem(KEY); } catch (e) {}
   location.reload();
