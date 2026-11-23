@@ -126,12 +126,12 @@
     <p>方法：冷蔵庫内を定点観測し、購入記録・廃棄記録・本人の証言と照合する。</p>
     <p>被験者K：大学2年、一人暮らし。本人の同意のもと、氏名は伏せて公開する。</p>
   </div>
-  <p class="small">※この記録は、あなたの端末内にだけ保存されます。外部に送信されることはありません。<br>※下のボタンで、観測室の環境音を出せます（任意）。</p>
+  <p class="small">※この記録は、あなたの端末内にだけ保存されます。外部に送信されることはありません。<br>※下のボタンで、観測室の環境音を出せます。</p>
   <div id="revisit" class="hidden">
     <p id="revisitText"></p>
   </div>
   <div class="choices">
-    <button class="plain" id="soundBtn" onclick="toggleSound()">🔇 音：オフ（観測室の環境音）</button>
+    <button class="plain" id="soundBtn" onclick="toggleSound()">🔇 音：オフ</button>
     <button class="primary" onclick="go('s-practice')">まず、練習記録を開く</button>
   </div>
 </section>
@@ -139,14 +139,14 @@
 
 <!-- 練習記録（記録0） -->
 <section id="s-practice">
-  <p class="ts">記録0 ― 練習（本番ではありません）</p>
+  <p class="ts">記録0 ― 練習</p>
   <h2>観測者の仕事は、1つだけです。</h2>
   <p>「記録」と「実物」のズレを見つけること。<br>まず、練習でやってみます。</p>
   <div class="grid" style="grid-template-columns: repeat(2, 1fr); width: min(92vw, 300px);">
     <div>🥛</div><div>🍎</div>
     <div>🧀</div><div>（空）</div>
   </div>
-  <p class="small">練習用冷蔵庫（1日目）。購入記録：この日、買ったのは🥛だけです。</p>
+  <p class="small">練習用冷蔵庫。購入記録：この日、買ったのは🥛だけです。</p>
   <div class="choices">
     <button class="primary" onclick="showPractice2()">2日目を見る</button>
   </div>
@@ -204,7 +204,7 @@
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>🥩</div><div>🍐🍐</div>
   </div></div>
-    <p class="small hidden" id="closed-day1">（冷蔵庫は、閉じられました）</p>
+    <p class="small hidden" id="closed-day1">冷蔵庫は、閉じられました</p>
     <button class="hidden" id="close-day1" onclick="closeFridge('day1','post-day1')">冷蔵庫を閉じる</button>
   </div>
   <div id="post-day1" class="hidden">
@@ -229,7 +229,7 @@
 <section id="day2">
   <p class="ts">DAY 2 ― 19:42　買い物／21:05　観測</p>
   <div class="doc receipt-doc">
-    <p class="dlabel">【資料1】購入記録（レシート）</p>
+    <p class="dlabel">【資料1】購入記録</p>
     <p>🍞 ×1<br>🧻 ×1<br>🍙 ×1<br>※いずれも、冷蔵庫の外で保管されるもの</p>
   </div>
   <div class="doc">
@@ -243,7 +243,7 @@
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍐</div>
   </div></div>
-    <p class="small hidden" id="closed-day2">（冷蔵庫は、閉じられました）</p>
+    <p class="small hidden" id="closed-day2">冷蔵庫は、閉じられました</p>
     <button class="hidden" id="close-day2" onclick="closeFridge('day2','post-day2')">冷蔵庫を閉じる</button>
   </div>
   <div id="post-day2" class="hidden">
@@ -271,7 +271,7 @@
 <section id="day3">
   <p class="ts">DAY 3 ― 07:58　観測</p>
   <div class="doc receipt-doc">
-    <p class="dlabel">【資料1】購入記録（レシート）</p>
+    <p class="dlabel">【資料1】購入記録</p>
     <p>🥫 ×1<br>🥛 ×1<br>※🥫は、棚で保管</p>
   </div>
   <div class="doc">
@@ -285,7 +285,7 @@
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
-    <p class="small hidden" id="closed-day3">（冷蔵庫は、閉じられました）</p>
+    <p class="small hidden" id="closed-day3">冷蔵庫は、閉じられました</p>
     <button class="hidden" id="close-day3" onclick="closeFridge('day3','post-day3')">冷蔵庫を閉じる</button>
   </div>
   <div id="post-day3" class="hidden">
@@ -316,8 +316,8 @@
 <section id="day4">
   <p class="ts">DAY 4 ― 20:17　観測</p>
   <div class="doc receipt-doc">
-    <p class="dlabel">【資料1】購入記録（レシート）</p>
-    <p id="day4receipt">（照合中の食材）×2</p>
+    <p class="dlabel">【資料1】購入記録</p>
+    <p id="day4receipt">×2</p>
   </div>
   <div class="doc">
     <p class="dlabel">【資料2】本人の申告</p>
@@ -330,7 +330,7 @@
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
-    <p class="small hidden" id="closed-day4">（冷蔵庫は、閉じられました）</p>
+    <p class="small hidden" id="closed-day4">冷蔵庫は、閉じられました</p>
     <button class="hidden" id="close-day4" onclick="closeFridge('day4','post-day4')">冷蔵庫を閉じる</button>
   </div>
   <div id="post-day4" class="hidden">
@@ -359,12 +359,12 @@
 <section id="day5">
   <p class="ts">DAY 5 ― 08:11　観測</p>
   <div class="doc receipt-doc">
-    <p class="dlabel">【資料1】購入記録（レシート）</p>
+    <p class="dlabel">【資料1】購入記録</p>
     <p>本日、購入記録はありません。</p>
   </div>
   <div class="doc">
     <p class="dlabel">【資料2】本人の申告</p>
-    <p>本日、申告はありません。<br>※昨日の申告：🥦を廃棄した（Day 4 ― 22:03）。</p>
+    <p>本日、申告はありません。<br>※昨日の申告：🥦を廃棄した ― Day 4、22:03。</p>
   </div>
   <div class="fridgebox">
     <button class="primary" id="open-day5" onclick="openFridge('day5')">冷蔵庫を開ける</button>
@@ -373,7 +373,7 @@
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
-    <p class="small hidden" id="closed-day5">（冷蔵庫は、閉じられました）</p>
+    <p class="small hidden" id="closed-day5">冷蔵庫は、閉じられました</p>
     <button class="hidden" id="close-day5" onclick="closeFridge('day5','post-day5')">冷蔵庫を閉じる</button>
   </div>
   <div id="post-day5" class="hidden">
@@ -406,7 +406,7 @@
 
 <!-- Day6：齟齬3 -->
 <section id="day6">
-  <p class="ts">DAY 6 ― 25:13　観測（時刻の記録に異常）</p>
+  <p class="ts">DAY 6 ― 25:13　観測</p>
   <div class="doc">
     <p class="dlabel">【資料】本人の証言</p>
     <p>観測者：初日に、卵は3個でした。<br>K：「卵？ 最初から、6個ですよ」</p>
@@ -419,7 +419,7 @@
     <div>🥕🥕</div><div>🥦</div><div>🍅🍅</div>
     <div>🍌</div><div>（空）</div><div>🍐🍇</div>
   </div></div>
-    <p class="small hidden" id="closed-day6">（冷蔵庫は、閉じられました）</p>
+    <p class="small hidden" id="closed-day6">冷蔵庫は、閉じられました</p>
     <button class="hidden" id="close-day6" onclick="closeFridge('day6','post-day6')">冷蔵庫を閉じる</button>
   </div>
   <div id="post-day6" class="hidden">
@@ -440,18 +440,18 @@
 <section id="day7">
   <p class="ts">DAY 7 ― 10:00　最終観測</p>
   <div class="doc">
-    <p class="dlabel">【資料】廃棄記録（観測期間中）</p>
+    <p class="dlabel">【資料】廃棄記録</p>
     <div id="wasteLog">
-      <p>🥚 ×3（6個のうち3個が、期限切れ）</p>
+      <p>🥚 ×3 ― 期限切れ</p>
       <p id="wasteFood">余らせた食材 ×1</p>
-      <p>🥦 ×1（捨てたつもりで残っていたもの。最終日に廃棄）</p>
-      <p>🍇 ×1（出所の記録がないまま、期限切れ）</p>
-      <p>合計：約 🪙×4（約400円）　※🪙＝100円として換算</p>
+      <p>🥦 ×1 ― 最終日に廃棄</p>
+      <p>🍇 ×1 ― 期限切れ</p>
+      <p>合計：約400円</p>
       <p>特売で浮いた分：約80円／捨てた分：約400円 ― 差し引き、損をしています</p>
     </div>
   </div>
   <div class="doc">
-    <p class="dlabel">【資料2】当事者の記録（食材）</p>
+    <p class="dlabel">【資料2】当事者の記録</p>
     <p>🥚「まだ3つ残っていたのに、特売で、もう1パック買われました。古い方から、期限が切れました」</p>
     <p>🥦「少し状態が悪くなったので、捨てられたと思っていました。――捨てられていませんでした」</p>
     <p id="wasteFoodVoice"></p>
@@ -464,7 +464,7 @@
     <div>🥕</div><div>（空）</div><div>🍅</div>
     <div>（空）</div><div>（空）</div><div>（空）</div>
   </div></div>
-    <p class="small hidden" id="closed-day7">（冷蔵庫は、閉じられました）</p>
+    <p class="small hidden" id="closed-day7">冷蔵庫は、閉じられました</p>
     <button class="hidden" id="close-day7" onclick="closeFridge('day7','post-day7')">冷蔵庫を閉じる</button>
   </div>
   <div id="post-day7" class="hidden">
@@ -563,10 +563,10 @@ function confirmFood() {
   state.foodPicked = !!picked;
   if (!picked) state.food = '🍌';
   document.getElementById('day4receipt').textContent =
-    state.food + ' ×2（ドアポケット分。前日は1つ）';
+    state.food + ' ×2';
   document.getElementById('day6food').textContent =
     state.food + ' は、傷み始めていた。記録には「まだ食べられる」とある。';
-  document.getElementById('wasteFood').textContent = state.food + ' ×1（増えた分の1つが、期限切れ）';
+  document.getElementById('wasteFood').textContent = state.food + ' ×1 ― 期限切れ';
   document.getElementById('wasteFoodVoice').textContent = state.food + '「安かったので、余分に買われました」';
   const cfc = document.getElementById('corrFoodCell');
   if (cfc) cfc.textContent = state.food + state.food;
@@ -578,7 +578,7 @@ let transitAnim = null;
 function transit(nextId, eraseId) {
   if (eraseId) {
     const el = document.getElementById(eraseId);
-    if (el) el.innerHTML = '<p class="small">（この記録は照合済みです。再表示はされません）</p>';
+    if (el) el.innerHTML = '<p class="small">この記録は照合済みです。再表示はされません</p>';
   }
   const target = document.getElementById(nextId);
   if (!target) return;
@@ -692,7 +692,7 @@ function answerCheck(n, noticed, btn) {
   if (st) {
     st.classList.remove('hidden');
     if (noticed) { st.textContent = '観測者所見 ― 異常として報告済み'; st.classList.add('stamp-red'); }
-    else { st.textContent = '観測者所見 ― 異常なしとして処理（未照合）'; st.classList.add('stamp-gray'); }
+    else { st.textContent = '観測者所見 ― 異常なしとして処理'; st.classList.add('stamp-gray'); }
   }
   const next = document.getElementById('toDay' + (n + 3));
   next.classList.remove('hidden');
@@ -708,35 +708,35 @@ function showEnding() {
   let reveal = '';
   const rz = load('reizouko_v1');
   if (rz && rz.lastTraps && rz.lastTraps.length) {
-    reveal += '<p>照合：あなたの買い物の記録（冷蔵庫の記憶テスト）にも、同じ型がありました（' + rz.lastTraps.join('・') + '）。</p>';
+    reveal += '<p>照合：あなたの買い物の記録にも、同じ型がありました ― ' + rz.lastTraps.join('・') + '。</p>';
   }
   if (state.score === 3) {
     title.textContent = '結末A「観測者」';
     log.innerHTML =
       '<p>照合表 ― 記録と、申告。</p>' +
-      '<p>🍇｜記録：Day 2のレシートに、購入行（特売）あり｜申告：「買っていない」</p>' +
+      '<p>🍇｜記録：Day 2のレシートに、購入行あり・特売｜申告：「買っていない」</p>' +
       '<p>🥚｜記録：Day 4に、購入記録なし｜証言：「最初から、6個」</p>' +
       '<p>🥦｜記録：廃棄の実行記録、なし｜申告：「捨てた」</p>' +
-      '<p>被験者K ― 登録票（抜粋）：買い物パターンの出典 …… 観測者の回答（' + state.food + '）</p>' + reveal;
+      '<p>被験者K ― 登録票：買い物パターンの出典 …… 観測者の回答：' + state.food + '</p>' + reveal;
     line.textContent = '幽霊は、いませんでした。怪異の正体は、忘れていく自分だった。';
   } else if (state.score >= 1) {
     title.textContent = '結末B「半分だけ見ていた」';
     const TBL = {
-      1: '<p>🍇｜記録：Day 2のレシートに、購入行（特売）あり｜申告：「買っていない」</p>',
+      1: '<p>🍇｜記録：Day 2のレシートに、購入行あり・特売｜申告：「買っていない」</p>',
       2: '<p>🥚｜記録：Day 4に、購入記録なし｜証言：「最初から、6個」</p>',
       3: '<p>🥦｜記録：廃棄の実行記録、なし｜申告：「捨てた」</p>'
     };
     const rows = [1, 2, 3].map(n => state.noticed[n] ? TBL[n]
       : '<p>' + CHECK_NAMES[n] + '：照合、未実施</p>').join('');
     log.innerHTML = '<p>照合表 ― 記録と、申告。</p>' + rows +
-      '<p>被験者K ― 登録票（抜粋）：買い物パターンの出典 …… 一部、伏せられています</p>' + reveal;
+      '<p>被験者K ― 登録票：買い物パターンの出典 …… 一部、伏せられています</p>' + reveal;
     line.textContent = '見落とした分は、あなたの冷蔵庫でも起きています。';
   } else {
     title.textContent = '結末C「原因不明」';
     log.innerHTML =
       '<p>本観測は、原因不明のまま終了する。</p>' +
       '<p>記録は、封印される。</p>' +
-      '<p>封印前に、1枚だけ差し込まれていた。被験者K ― 登録票（抜粋）：買い物パターンの出典 …… 観測者の回答（' + state.food + '）</p>';
+      '<p>封印前に、1枚だけ差し込まれていた。被験者K ― 登録票：買い物パターンの出典 …… 観測者の回答：' + state.food + '</p>';
     line.textContent = '……ただ、最後の1行が、追加されています。';
   }
   const setStamp = (id, on) => {
