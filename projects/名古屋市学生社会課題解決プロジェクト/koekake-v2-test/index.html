@@ -411,14 +411,14 @@
     s.append(el("p", "text big", "もう一度。今度は3秒で。"));
     await choose(s, [{ label: "はじめる" }], "single");
 
-    // 第一問と同じ左右の並びで出す（押し間違いではなく、反応を測るため）
+    // 第一問と左右を逆にして出す（位置で覚えて押すのではなく、言葉を読んで選ぶ反応を測るため）
     s = screen();
     const f = el("div", "face", "😀");
     s.append(f, el("p", "say", "「ぼく、せんせいになりたい！」"));
     const bar = el("div", "timer", "<i></i>");
     s.appendChild(bar);
     const opts = { A: { label: q(S.happy), v: "A" }, B: { label: q(S.sad), v: "B" } };
-    const picking = choose(s, (S.orders[0] || ["A", "B"]).map((v) => opts[v]), "pair", false);
+    const picking = choose(s, [...(S.orders[0] || ["A", "B"])].reverse().map((v) => opts[v]), "pair", false);
     const box = s._box;
     const anim = bar.firstChild.animate([{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }], { duration: 3000, fill: "forwards" });
     const r = await Promise.race([picking, new Promise((res) => setTimeout(() => res({ v: "T" }), 3000))]);
