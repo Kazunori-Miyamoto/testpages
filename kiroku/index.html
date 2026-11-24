@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>記録 ― あなたの冷蔵庫</title>
+<style>
+* { box-sizing: border-box;}
+html { scroll-behavior: smooth;}
+body { margin: 0; background: #0a0a0c; color: #d8d8d2; font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif; line-height: 1.9; font-size: 15px;}
+main { max-width: 560px; margin: 0 auto; padding: 0 20px;}
+section { padding: 56px 0 40px; border-bottom: 1px solid #26262b;}
+h1 { font-size: 22px; letter-spacing:.14em; margin: 10px 0 4px; font-weight: 600;}
+h2 { font-size: 16px; letter-spacing:.1em; margin: 0 0 14px; font-weight: 600;}
+.ts { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; color: #8a8a92; letter-spacing:.08em; margin: 0 0 6px;}
+.rec { color: #e0483e;}
+.small { font-size: 12.5px; color: #9a9aa2;}
+.fine { font-size: 11.5px; color: #6f6f77;}
+.hidden { display: none;}
+.doc { background: #101013; border: 1px solid #2c2c33; border-left: 3px solid #55555f; padding: 14px 16px; margin: 14px 0; font-size: 14px;}
+.doc.doc-title { font-size: 12px; color: #9a9aa2; letter-spacing:.12em; margin-bottom: 8px;}
+.doc p { margin: 6px 0;}
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0;}
+.cell { border: 1px solid #33333b; background: #101013; min-height: 64px; display: flex; align-items: center; justify-content: center; font-size: 21px; letter-spacing: 2px; padding: 6px 2px; text-align: center;}
+.cell.empty { font-size: 11px; color: #55555e; letter-spacing:.1em;}
+button, a.btn { display: block; width: 100%; margin: 10px 0; padding: 13px 16px; background: #17171b; color: #d8d8d2; border: 1px solid #3a3a43; font-size: 15px; text-align: left; cursor: pointer; font-family: inherit; text-decoration: none;}
+button:hover, a.btn:hover { border-color: #6a6a76;}
+button.primary { border-color: #8a2f28; background: #1d1113;}
+button.plain { border: none; background: none; color: #8a8a92; font-size: 13px; text-align: center;}
+button:disabled { opacity:.45; cursor: default;}
+.choices { margin: 18px 0 6px;}
+.reaction { min-height: 1.6em; color: #c9c9a8; font-size: 14px; margin: 8px 0; white-space: pre-wrap;}
+.stamp { display: inline-block; border: 2px solid #b03a32; color: #d0554c; padding: 2px 12px; transform: rotate(-2deg); font-size: 13.5px; letter-spacing:.18em; margin: 14px 0 30px; background: rgba(20,8,8,.35);}
+.stamp.gray { border-color: #55555f; color: #8a8a92;}
+.stamp.green { border-color: #3f7a4e; color: #6fae7e;}
+.fridge-wrap { margin: 10px 0;}
+.palette { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0;}
+.palette button { width: auto; font-size: 26px; padding: 8px 14px; margin: 0; text-align: center;}
+.palette button.picked { border-color: #b03a32; background: #221114;}
+.corr { min-height: 460svh; display: flex; flex-direction: column; justify-content: space-evenly; padding: 0; border-bottom: 1px solid #26262b;}
+.glimpse { opacity:.5; filter: blur(1.2px);}
+.glimpse.cell { font-size: 17px; min-height: 48px;}
+.paper { background: #e9e6dd; color: #26241f; padding: 26px 22px 22px; margin: 18px 0; font-size: 13.5px; line-height: 1.75; position: relative; overflow: hidden;}
+.paper.p-head { text-align: center; border-bottom: 2px solid #26241f; padding-bottom: 10px; margin-bottom: 12px;}
+.paper.p-org { font-size: 11px; letter-spacing:.3em;}
+.paper.p-title { font-size: 17px; letter-spacing:.18em; margin-top: 2px;}
+.paper table { width: 100%; border-collapse: collapse; margin: 10px 0;}
+.paper td { border-top: 1px solid #b9b4a6; padding: 7px 4px; vertical-align: top;}
+.paper td.k { width: 42%; color: #55524a;}
+.paper.mini { display: inline-block; border: 1.5px solid #a33327; color: #a33327; border-radius: 50%; padding: 1px 7px; font-size: 11px; transform: rotate(-4deg); margin-left: 6px; white-space: nowrap;}
+.paper.mini.gray { border-color: #8a877e; color: #8a877e;}
+.paper.big-stamp { position: absolute; right: 14px; bottom: 52px; border: 3px solid #a33327; color: #a33327; padding: 4px 14px; font-size: 19px; letter-spacing:.22em; transform: rotate(-9deg); opacity:.85; background: rgba(233,230,221,.55);}
+.paper.p-total { border-top: 2px solid #26241f; padding-top: 10px; margin-top: 12px;}
+.paper.p-will { margin-top: 8px;}
+.big { font-size: 19px; line-height: 2; margin: 22px 0;}
+.topcopy { font-size: 19px; letter-spacing:.42em; margin: 16px 0 2px; color: #e8e8e2;}
+.topsub { font-size: 12.5px; color: #8a8a92; letter-spacing:.14em; margin: 0 0 10px;}
+</style>
+</head>
+<body>
+<main>
+
+<!-- 導入 -->
+<section id="s0">
+<p class="ts"><span class="rec">● REC</span>　ARCHIVE No. Y-01　<span id="liveClock"></span></p>
+<p class="topcopy">記録は、ずれている。</p>
+<p class="topsub">生活記録観測所 ― 自己記録プログラム</p>
+<h1>記録 ― あなたの冷蔵庫</h1>
+<div class="doc">
+<p>プログラムの内容：あなたは、自分の冷蔵庫の記録者になります。</p>
+<p>期間：7日間。毎日、その日の出来事を記録し、記録を確定してください。</p>
+<p>本所の記録に、誤りはありません。</p>
+</div>
+<p>はじめに、今週の方針を1つ選んでください。記録の冒頭に、あなたの言葉として残ります。</p>
+<div class="choices" id="policyChoices">
+<button data-policy="0">今週は、全部使い切る</button>
+<button data-policy="1">期限は、必ず守る</button>
+<button data-policy="2">記録は、正確につける</button>
+</div>
+<p class="reaction" id="policyMsg"></p>
+<div class="choices">
+<button class="primary" id="startBtn" onclick="startProgram()" disabled>記録をはじめる</button>
+<button class="plain" id="soundBtn" onclick="toggleSound()">音：オフ（冷蔵庫のモーター音）</button>
+</div>
+<div id="revisit" class="hidden">
+<div class="doc">
+<div class="doc-title">前回の記録</div>
+<p id="revisitText"></p>
+</div>
+</div>
+<p class="fine">※ この記録はフィクションです。入力した内容は、この端末の中にだけ保存されます。</p>
+</section>
+
+<!-- Day 1 -->
+<section id="d1">
+<p class="ts">DAY 1 ― 記録開始</p>
+<h2>初期在庫の記録</h2>
+<div class="doc">
+<div class="doc-title"></div>
+<p>冷蔵庫の中身を確認し、初期在庫として記録してください。これが、7日間の基準になります。</p>
+</div>
+<div class="fridge-wrap">
+<div class="grid" id="grid1"></div>
+</div>
+<div id="rec1" class="hidden">
+<div class="doc">
+<div class="doc-title"></div>
+<p id="stock1"></p>
+<p>方針：<span id="policyLine1"></span></p>
+</div>
+<span class="stamp green">照合 ― 一致</span>
+</div>
+<div class="choices">
+<button class="primary" id="btnRec1" onclick="showRecord(1)">初期在庫を記録する</button>
+<button id="btnGo2" class="hidden" onclick="transit('d2')">記録を確定して、次の日へ</button>
+</div>
+</section>
+
+<!-- Day 2 -->
+<section id="d2">
+<p class="ts">DAY 2</p>
+<h2>買い物の日</h2>
+<div class="doc">
+<div class="doc-title"></div>
+<p>夕方、買い物に行くかどうかを選んでください。</p>
+</div>
+<div class="choices" id="ch2">
+<button onclick="choose2(true)">買い物に行く ― 🥛×1、🥚×2 を買う</button>
+<button onclick="choose2(false)">今日は行かない</button>
+</div>
+<div id="rec2" class="hidden">
+<div class="doc">
+<div class="doc-title"></div>
+<p id="event2"></p>
+<p id="stock2"></p>
+</div>
+<span class="stamp green">照合 ― 一致</span>
+<div class="choices">
+<button onclick="transit('corrA')">記録を確定して、次の日へ</button>
+</div>
+</div>
+</section>
+
+<!-- 回廊A -->
+<section id="corrA" class="corr">
+<p class="small">記録を、送付しています</p>
+<div class="glimpse">
+<p class="ts">別プログラムの記録 ― 抜粋</p>
+<div class="grid">
+<div class="cell">🥛</div><div class="cell">🥚🥚</div><div class="cell"><span class="empty">（空）</span></div>
+<div class="cell">🥕</div><div class="cell">🥦</div><div class="cell">🍅</div>
+<div class="cell">🍌</div><div class="cell"><span class="empty">（空）</span></div><div class="cell">🍞</div>
+</div>
+<p class="small">照合：完了</p>
+</div>
+<p class="small">照合：完了</p>
+</section>
+
+<!-- Day 3 -->
+<section id="d3">
+<p class="ts">DAY 3</p>
+<h2>夕食</h2>
+<div class="doc">
+<div class="doc-title"></div>
+<p>夕食をどうするか、選んでください。</p>
+</div>
+<div class="choices" id="ch3">
+<button onclick="choose3(true)">🥕と🥦で味噌汁を作る</button>
+<button onclick="choose3(false)">外食する</button>
+</div>
+<div id="rec3" class="hidden">
+<div class="doc">
+<div class="doc-title"></div>
+<p id="event3"></p>
+<p id="stock3"></p>
+</div>
+<p>観測者への確認：この記録は、正しいですか？</p>
+<div class="choices" id="chk3">
+<button onclick="answerCheck(3, false)">正しい</button>
+<button onclick="answerCheck(3, true)">違う気がする</button>
+</div>
+<p class="reaction" id="chkMsg3"></p>
+<div class="choices hidden" id="go3">
+<button onclick="transit('d4')">記録を確定して、次の日へ</button>
+</div>
+</div>
+</section>
+
+<!-- Day 4 -->
+<section id="d4">
+<p class="ts">DAY 4</p>
+<h2>夕食</h2>
+<div class="doc">
+<div class="doc-title"></div>
+<p>夕食をどうするか、選んでください。</p>
+</div>
+<div class="choices" id="ch4">
+<button onclick="choose4(true)">オムレツを作る ― 🥚を2つ使う</button>
+<button onclick="choose4(false)">トーストにする ― 🍞を1つ使う</button>
+</div>
+<div id="rec4" class="hidden">
+<div class="doc">
+<div class="doc-title"></div>
+<p id="event4"></p>
+<p id="stock4"></p>
+</div>
+<p>観測者への確認：この記録は、正しいですか？</p>
+<div class="choices" id="chk4">
+<button onclick="answerCheck(4, false)">正しい</button>
+<button onclick="answerCheck(4, true)">違う気がする</button>
+</div>
+<p class="reaction" id="chkMsg4"></p>
+<div class="choices hidden" id="go4">
+<button onclick="transit('d5')">記録を確定して、次の日へ</button>
+</div>
+</div>
+</section>
+
+<!-- Day 5 -->
+<section id="d5">
+<p class="ts">DAY 5 ― <span id="day5clock"></span></p>
+<h2>Day 5 の記録</h2>
+<div class="doc">
+<div class="doc-title"></div>
+<p>（記録なし）</p>
+</div>
+<p>この日の出来事は、記録されていません。冷蔵庫だけが、残っています。</p>
+<div class="choices">
+<button onclick="openDay5()">冷蔵庫を開ける</button>
+</div>
+<div id="d5open" class="hidden">
+<div class="fridge-wrap">
+<div class="grid" id="grid5"></div>
+</div>
+<p class="small">冷蔵庫は、閉じられました</p>
+<div class="choices">
+<button class="primary" onclick="transit('corrB')">記録なしで、確定する</button>
+</div>
+</div>
+</section>
+
+<!-- 回廊B -->
+<section id="corrB" class="corr">
+<p class="small">記録を、送付しています</p>
+<p class="small">……</p>
+<p class="small">照合：保留</p>
+</section>
+
+<!-- Day 6 -->
+<section id="d6">
+<p class="ts">DAY 6</p>
+<h2>期限の確認</h2>
+<div class="doc">
+<div class="doc-title"></div>
+<p>🍅の期限が、昨日で切れています。どうするかは、記録者であるあなたが決めてください。本所は、判断しません。</p>
+</div>
+<div class="choices" id="ch6">
+<button class="primary" onclick="choose6(true)">破棄する</button>
+<button onclick="choose6(false)">まだ食べられる</button>
+</div>
+<div id="rec6" class="hidden">
+<div class="doc">
+<div class="doc-title"></div>
+<p id="event6"></p>
+<p id="stock6"></p>
+</div>
+<div class="choices">
+<button onclick="transit('d7')">記録を確定して、最終日へ</button>
+</div>
+</div>
+</section>
+
+<!-- Day 7 -->
+<section id="d7">
+<p class="ts">DAY 7 ― 最終日</p>
+<h2>最後の照合</h2>
+<div class="fridge-wrap">
+<div class="grid" id="grid7"></div>
+</div>
+<p class="small">冷蔵庫は、片付いていました。Day 1 と、同じ冷蔵庫です。中身だけが、減りました。</p>
+<div class="doc">
+<div class="doc-title"></div>
+<p id="policyAltered"></p>
+</div>
+<p>最後に、確認します。Day 1 に、あなたが選んだ方針は、どれですか？</p>
+<div class="choices" id="memoChoices">
+<button id="memoOrig" onclick="answerMemo('orig')"></button>
+<button id="memoAlt" onclick="answerMemo('alt')"></button>
+<button onclick="answerMemo('forgot')">覚えていない</button>
+</div>
+<p class="reaction" id="memoMsg"></p>
+<div class="choices hidden" id="goEnd">
+<button class="primary" onclick="showEnding()">記録ファイルを、閉じる</button>
+</div>
+</section>
+
+<!-- 結末 -->
+<section id="s-ending" class="hidden">
+<p class="ts">FILE ― 記録者：あなた</p>
+<h2 id="endTitle"></h2>
+<p id="endText"></p>
+</section>
+
+<!-- 結果 -->
+<section id="s-result" class="hidden">
+<p class="ts">RESULT</p>
+<h2>記録ファイル</h2>
+<p>観測が完了しました。ご協力ありがとうございました。</p>
+<div class="paper" id="resultPaper">
+<div class="p-head">
+<div class="p-org">生活記録観測所</div>
+<div class="p-title">生活記録ファイル ― 表紙</div>
+</div>
+<table>
+<tr><td class="k">記録番号</td><td>Y-01</td></tr>
+<tr><td class="k">記録者</td><td>あなた</td></tr>
+<tr><td class="k">記録期間</td><td>7日間</td></tr>
+<tr><td class="k">Day 3 ― 注記の追加</td><td><span id="rowD3"></span></td></tr>
+<tr><td class="k">Day 4 ― 表記の変更</td><td><span id="rowD4"></span></td></tr>
+<tr><td class="k">Day 5 ― 記録の欠落</td><td><span id="rowD5"></span></td></tr>
+<tr><td class="k">Day 6 ― 期限切れの判断</td><td><span id="rowD6"></span></td></tr>
+<tr><td class="k">方針メモ ― 書き換え</td><td><span id="rowMemo"></span></td></tr>
+</table>
+<div class="p-total" id="resultTotal"></div>
+<p class="fine" style="color:#8a877e">超常現象は、ない。あるのは、冷蔵庫と、ずれる記録だけ</p>
+<div class="big-stamp" id="resultStamp"></div>
+</div>
+<p class="reaction" id="resultMsg"></p>
+<div class="choices">
+<button class="primary" onclick="saveResultImage()">結果画像を保存する</button>
+<button onclick="go('s-final')">最後の記録へ</button>
+</div>
+<canvas id="resultCanvas" width="880" height="1040" class="hidden"></canvas>
+</section>
+
+<!-- 最後の記録 -->
+<section id="s-final">
+<p class="ts" id="finalDate"></p>
+<p>記録は、書き換わる。写真は、書き換わらない。<br>行動は、1つだけです。</p>
+<p class="big"><strong>買い物に行く前に、<br>冷蔵庫の写真を1枚撮る。</strong></p>
+<div class="choices">
+<button class="primary" onclick="shareRecord()">この記録をシェアする</button>
+<a class="btn" href="https://kazunori-miyamoto.github.io/testpages/kansoku/">観測記録K ― 他人の冷蔵庫を、観測する ＞</a>
+<a class="btn" href="https://kazunori-miyamoto.github.io/testpages/reizouko/">次は、あなたの買い物が観測されます ＞</a>
+<a class="btn" href="https://www.kodomokoho.metro.tokyo.lg.jp/article/202404-3/" target="_blank" rel="noopener">フードロスについて、くわしく見る ＞</a>
+<button class="plain" onclick="location.reload()">記録を読み直す</button>
+<button class="plain" onclick="resetHistory()">記録履歴をリセット</button>
+</div>
+</section>
+
+<script>
+const KEY = 'kiroku_v1';
+const POLICIES = ['今週は、全部使い切る', '期限は、必ず守る', '記録は、正確につける'];
+const ALTERED = ['今週は、全部使い切ったことにする', '期限は、守ったことにする', '記録は、正確につけたことにする'];
+const ORDER = ['🥛', '🥚', '🧀', '🥕', '🥦', '🍅', '🍌', '🥩', '🍞'];
+const state = {
+  policy: -1,
+  items: { '🥛': 2, '🥚': 4, '🧀': 1, '🥕': 2, '🥦': 1, '🍅': 2, '🍌': 2, '🥩': 1, '🍞': 2 },
+  noticed: { 3: false, 4: false },
+  discarded: null,
+  memo: null,
+  missing: null
+};
+
+function load(key) { try { return JSON.parse(localStorage.getItem(key)) || null; } catch (e) { return null; } }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+function go(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+
+(function init() {
+  const h = load(KEY);
+  if (h && h.plays > 0) {
+    document.getElementById('revisitText').textContent =
+      '前回の記録が、残っています。前回、あなたが気づけたずれは ' + h.lastScore + ' / 3 でした。……本当に、そうでしたか？';
+    document.getElementById('revisit').classList.remove('hidden');
+  }
+  const d = new Date();
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  document.getElementById('finalDate').textContent =
+    d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' ' + hh + ':' + mm + ' ― 新規記録対象：あなたの冷蔵庫';
+  const clock = document.getElementById('liveClock');
+  const tick = () => {
+    const t = new Date();
+    clock.textContent = t.getFullYear() + '.' + (t.getMonth() + 1) + '.' + t.getDate() + ' ' +
+      String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
+  };
+  tick(); setInterval(tick, 1000);
+  const d5 = new Date(Date.now() + 60000);
+  document.getElementById('day5clock').textContent =
+    String(d5.getHours()).padStart(2, '0') + ':' + String(d5.getMinutes()).padStart(2, '0') + ':' + String(d5.getSeconds()).padStart(2, '0');
+  renderGrid('grid1');
+})();
+
+/* 方針の選択 */
+document.getElementById('policyChoices').addEventListener('click', function (e) {
+  const b = e.target.closest('button'); if (!b) return;
+  state.policy = parseInt(b.dataset.policy, 10);
+  document.getElementById('policyMsg').textContent = '方針を記録しました：「' + POLICIES[state.policy] + '」';
+  document.getElementById('startBtn').disabled = false;
+});
+function startProgram() {
+  document.getElementById('policyLine1').textContent = POLICIES[state.policy];
+  go('d1');
+}
+
+/* 冷蔵庫グリッドと在庫行 */
+function cellHTML(e) {
+  const n = state.items[e];
+  if (!n) return '<span class="empty">（空）</span>';
+  if (n === 1) return e;
+  return e + '<span style="font-size:13px">×' + n + '</span>';
+}
+function renderGrid(id) {
+  document.getElementById(id).innerHTML = ORDER.map(e => '<div class="cell">' + cellHTML(e) + '</div>').join('');
+}
+function stockLine(day) {
+  const parts = [];
+  for (const e of ORDER) {
+    const n = state.items[e];
+    if (!n) continue;
+    if (day === 4 && e === '🥚' && n >= 2) { parts.push('🥚×' + (n - 1) + ' と、1つ'); continue; }
+    let t = e + '×' + n;
+    if (day === 3 && e === '🥛') t += '（開封済み）';
+    parts.push(t);
+  }
+  return '残数：' + parts.join('　');
+}
+
+/* 進行 */
+function transit(nextId) {
+  if (nextId === 'd7') prepareDay7();
+  const target = document.getElementById(nextId);
+  if (!target) return;
+  const startY = window.scrollY;
+  const endY = target.getBoundingClientRect().top + window.scrollY;
+  const dur = 2400;
+  const t0 = performance.now();
+  let cancelled = false;
+  const cancel = () => { cancelled = true; };
+  window.addEventListener('wheel', cancel, { passive: true, once: true });
+  window.addEventListener('touchstart', cancel, { passive: true, once: true });
+  (function step(t) {
+    if (cancelled) return;
+    const p = Math.min(1, (t - t0) / dur);
+    window.scrollTo(0, startY + (endY - startY) * p);
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+function lockChoices(id) {
+  document.querySelectorAll('#' + id + ' button').forEach(b => b.disabled = true);
+}
+
+/* Day 1 */
+function showRecord(day) {
+  document.getElementById('stock1').textContent = stockLine(1);
+  document.getElementById('rec1').classList.remove('hidden');
+  document.getElementById('btnRec1').classList.add('hidden');
+  document.getElementById('btnGo2').classList.remove('hidden');
+}
+
+/* Day 2 */
+function choose2(buy) {
+  lockChoices('ch2');
+  if (buy) { state.items['🥛'] += 1; state.items['🥚'] += 2; }
+  document.getElementById('event2').textContent = buy ? '購入：🥛×1、🥚×2' : '購入：なし';
+  document.getElementById('stock2').textContent = stockLine(2);
+  document.getElementById('rec2').classList.remove('hidden');
+}
+
+/* Day 3・4 */
+function choose3(cook) {
+  lockChoices('ch3');
+  if (cook) { state.items['🥕'] -= 1; state.items['🥦'] = 0; }
+  document.getElementById('event3').textContent = cook ? '消費：🥕×1、🥦×1（味噌汁）' : '消費：なし（外食）';
+  document.getElementById('stock3').textContent = stockLine(3);
+  document.getElementById('rec3').classList.remove('hidden');
+}
+function choose4(omelet) {
+  lockChoices('ch4');
+  if (omelet) { state.items['🥚'] -= 2; } else { state.items['🍞'] -= 1; }
+  document.getElementById('event4').textContent = omelet ? '消費：🥚×2（オムレツ）' : '消費：🍞×1（トースト）';
+  document.getElementById('stock4').textContent = stockLine(4);
+  document.getElementById('rec4').classList.remove('hidden');
+}
+function answerCheck(day, suspicious) {
+  state.noticed[day] = suspicious;
+  lockChoices('chk' + day);
+  document.getElementById('chkMsg' + day).textContent = suspicious
+    ? '修正しました。'
+    : '記録は、確定されました。';
+  document.getElementById('go' + day).classList.remove('hidden');
+}
+
+/* Day 5 */
+function openDay5() {
+  if (!state.missing) {
+    for (const e of ['🥦', '🥕', '🍌']) {
+      if (state.items[e] > 0) { state.items[e] -= 1; state.missing = e; break; }
+    }
+  }
+  renderGrid('grid5');
+  document.getElementById('d5open').classList.remove('hidden');
+  dipSound();
+}
+
+/* Day 6 */
+function choose6(discard) {
+  lockChoices('ch6');
+  state.discarded = discard;
+  if (discard) state.items['🍅'] = 0;
+  document.getElementById('event6').textContent = discard
+    ? '🍅 ×2 ― 記録者により破棄'
+    : '🍅 ×2 ― 記録者により保持（期限切れ）';
+  document.getElementById('stock6').textContent = stockLine(6);
+  document.getElementById('rec6').classList.remove('hidden');
+}
+
+/* Day 7 */
+function prepareDay7() {
+  renderGrid('grid7');
+  document.getElementById('policyAltered').textContent = ALTERED[state.policy];
+  document.getElementById('memoOrig').textContent = POLICIES[state.policy];
+  document.getElementById('memoAlt').textContent = ALTERED[state.policy];
+}
+function answerMemo(kind) {
+  state.memo = kind;
+  lockChoices('memoChoices');
+  document.getElementById('memoMsg').textContent =
+    kind === 'orig' ? '……その通りです。あなたの記憶は、正しく残っていました。' :
+    kind === 'alt' ? 'そうですか。では、そのように記録しておきます。' :
+    '分かりました。記録のほうに、残っています。';
+  document.getElementById('goEnd').classList.remove('hidden');
+}
+
+/* 結末と結果 */
+function score() {
+  return (state.noticed[3] ? 1 : 0) + (state.noticed[4] ? 1 : 0) + (state.memo === 'orig' ? 1 : 0);
+}
+function showEnding() {
+  const n = score();
+  const titles = { 3: '記録者', 2: '記録は、ずれていた', 1: '記録は、ずれていた', 0: '記録は、もうあなたのものではない' };
+  const texts = {
+    3: '全部のずれに、あなたは気づけました。記録は、まだあなたのものでした。\n\n……それでも、Day 5 に何があったのかは、誰にも分かりません。',
+    2: 'ずれの一部は、あなたの目をすり抜けました。記録は、確定されるたびに、少しずつあなたのものではなくなっていました。',
+    1: 'ずれの一部は、あなたの目をすり抜けました。記録は、確定されるたびに、少しずつあなたのものではなくなっていました。',
+    0: 'ずれは、全部すり抜けました。方針メモの文面まで、書き換わったものが、あなたの記録として残ります。'
+  };
+  document.getElementById('endTitle').textContent = titles[n];
+  document.getElementById('endText').innerText = texts[n];
+  const mini = (label, gray) => '<span class="mini' + (gray ? ' gray' : '') + '">' + label + '</span>';
+  document.getElementById('rowD3').innerHTML = (state.noticed[3] ? '記録者が指摘' : '指摘なし') + mini(state.noticed[3] ? '指摘' : '見過ごし', !state.noticed[3]);
+  document.getElementById('rowD4').innerHTML = (state.noticed[4] ? '記録者が指摘' : '指摘なし') + mini(state.noticed[4] ? '指摘' : '見過ごし', !state.noticed[4]);
+  document.getElementById('rowD5').innerHTML = 'この日の記録は、ありません' + mini('照合不能', true);
+  document.getElementById('rowD6').innerHTML = (state.discarded ? '記録者により破棄' : '記録者により保持') + mini(state.discarded ? '破棄' : '保持', !state.discarded);
+  document.getElementById('rowMemo').innerHTML =
+    (state.memo === 'orig' ? '記憶は、正しかった' : state.memo === 'alt' ? '書き換わった文が、選ばれました' : '未照合') +
+    mini(state.memo === 'orig' ? '一致' : '不一致', state.memo !== 'orig');
+  document.getElementById('resultTotal').textContent = '気づけたずれ：' + n + ' / 3 ― ' +
+    (n === 3 ? '記録は、まだあなたのものでした' : n === 0 ? '記録は、もうあなたのものではありません' : '記録は、ずれていました');
+  document.getElementById('resultStamp').textContent = n === 3 ? '記録保全' : n === 0 ? '記録喪失' : 'ずれあり';
+  document.getElementById('resultMsg').textContent = '気づけたずれ：' + n + ' / 3 ― 結果画像は保存してシェアできます。';
+  document.getElementById('s-ending').classList.remove('hidden');
+  document.getElementById('s-result').classList.remove('hidden');
+  const h = load(KEY) || { plays: 0 };
+  h.plays = (h.plays || 0) + 1;
+  h.lastScore = n;
+  save(KEY, h);
+  go('s-ending');
+}
+
+/* 結果画像 */
+function saveResultImage() {
+  const c = document.getElementById('resultCanvas');
+  const x = c.getContext('2d');
+  const n = score();
+  x.fillStyle = '#e9e6dd'; x.fillRect(0, 0, 880, 1040);
+  x.fillStyle = '#26241f'; x.textAlign = 'center';
+  x.font = '22px sans-serif'; x.fillText('生 活 記 録 観 測 所', 440, 84);
+  x.font = 'bold 40px sans-serif'; x.fillText('生活記録ファイル ― 表紙', 440, 142);
+  x.fillRect(70, 172, 740, 3);
+  x.textAlign = 'left'; x.font = '27px sans-serif';
+  const rows = [
+    ['記録番号', 'Y-01'],
+    ['記録者', 'あなた'],
+    ['記録期間', '7日間'],
+    ['Day 3 ― 注記の追加', state.noticed[3] ? '指摘' : '見過ごし'],
+    ['Day 4 ― 表記の変更', state.noticed[4] ? '指摘' : '見過ごし'],
+    ['Day 5 ― 記録の欠落', '照合不能'],
+    ['Day 6 ― 期限切れの判断', state.discarded ? '破棄' : '保持'],
+    ['方針メモ ― 書き換え', state.memo === 'orig' ? '一致' : '不一致']
+  ];
+  rows.forEach((r, i) => {
+    const y = 248 + i * 66;
+    x.fillStyle = '#55524a'; x.fillText(r[0], 90, y);
+    x.fillStyle = '#26241f'; x.fillText(r[1], 470, y);
+    x.strokeStyle = '#b9b4a6'; x.beginPath(); x.moveTo(70, y + 20); x.lineTo(810, y + 20); x.stroke();
+  });
+  x.fillStyle = '#26241f'; x.fillRect(70, 792, 740, 3);
+  x.font = 'bold 29px sans-serif';
+  x.fillText('気づけたずれ：' + n + ' / 3', 90, 856);
+  x.font = '21px sans-serif'; x.fillStyle = '#55524a';
+  x.fillText('超常現象は、ない。あるのは、冷蔵庫と、ずれる記録だけ', 90, 906);
+  x.save();
+  x.translate(660, 950); x.rotate(-9 * Math.PI / 180);
+  x.strokeStyle = '#a33327'; x.lineWidth = 4; x.strokeRect(-105, -38, 210, 76);
+  x.fillStyle = '#a33327'; x.font = 'bold 36px sans-serif'; x.textAlign = 'center';
+  x.fillText(n === 3 ? '記録保全' : n === 0 ? '記録喪失' : 'ずれあり', 0, 13);
+  x.restore();
+  const a = document.createElement('a');
+  a.download = 'kiroku-result.png';
+  a.href = c.toDataURL('image/png');
+  a.click();
+}
+
+/* 共有・リセット */
+function shareRecord() {
+  const n = score();
+  const text = '『記録 ― あなたの冷蔵庫』気づけたずれは ' + n + ' / 3 でした。記録は、書き換わる。写真は、書き換わらない。 #フードロス';
+  const url = 'https://kazunori-miyamoto.github.io/testpages/kiroku/';
+  if (navigator.share) { navigator.share({ title: '記録 ― あなたの冷蔵庫', text: text, url: url }).catch(() => {}); }
+  else if (navigator.clipboard) { navigator.clipboard.writeText(text + ' ' + url).then(() => alert('シェア文をコピーしました')); }
+}
+function resetHistory() {
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+}
+
+/* 音：冷蔵庫のモーター音（任意） */
+let audioCtx = null, humOsc = null, humGain = null, noiseGain = null, soundOn = false;
+function toggleSound() {
+  const btn = document.getElementById('soundBtn');
+  if (!soundOn) {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      audioCtx.resume();
+      humGain = audioCtx.createGain(); humGain.gain.value = 0.5;
+      noiseGain = audioCtx.createGain(); noiseGain.gain.value = 0.2;
+      humOsc = audioCtx.createOscillator();
+      humOsc.type = 'sawtooth'; humOsc.frequency.value = 55;
+      const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 240;
+      humOsc.connect(lp); lp.connect(humGain); humGain.connect(audioCtx.destination);
+      const len = audioCtx.sampleRate * 2;
+      const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      const noise = audioCtx.createBufferSource(); noise.buffer = buf; noise.loop = true;
+      const nf = audioCtx.createBiquadFilter(); nf.type = 'lowpass'; nf.frequency.value = 400;
+      noise.connect(nf); nf.connect(noiseGain); noiseGain.connect(audioCtx.destination);
+      humOsc.start(); noise.start();
+      soundOn = true;
+      btn.textContent = '音：オン（冷蔵庫のモーター音）';
+    } catch (e) {}
+  } else {
+    try { if (humOsc) humOsc.stop(); } catch (e) {}
+    if (audioCtx) audioCtx.close(); audioCtx = null;
+    soundOn = false;
+    btn.textContent = '音：オフ（冷蔵庫のモーター音）';
+  }
+}
+function dipSound() {
+  if (!soundOn || !audioCtx || !humGain) return;
+  const t = audioCtx.currentTime;
+  humGain.gain.cancelScheduledValues(t);
+  humGain.gain.setValueAtTime(humGain.gain.value, t);
+  humGain.gain.linearRampToValueAtTime(0.004, t + 0.25);
+  humGain.gain.linearRampToValueAtTime(0.5, t + 1.6);
+  if (noiseGain) {
+    noiseGain.gain.cancelScheduledValues(t);
+    noiseGain.gain.setValueAtTime(noiseGain.gain.value, t);
+    noiseGain.gain.linearRampToValueAtTime(0.003, t + 0.25);
+    noiseGain.gain.linearRampToValueAtTime(0.2, t + 1.6);
+  }
+}
+</script>
+</main>
+</body>
+</html>
