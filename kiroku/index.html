@@ -136,7 +136,7 @@ button:disabled { opacity:.45; cursor: default;}
 </div>
 <span class="stamp green">照合 ― 一致</span>
 <div class="choices">
-<button onclick="transit('corrA')">記録を確定して、次の日へ</button>
+<button onclick="transit('d3')">記録を確定して、次の日へ</button>
 </div>
 </div>
 </section>
@@ -234,7 +234,7 @@ button:disabled { opacity:.45; cursor: default;}
 </div>
 <p class="small">冷蔵庫は、閉じられました</p>
 <div class="choices">
-<button class="primary" onclick="transit('corrB')">記録なしで、確定する</button>
+<button class="primary" onclick="transit('d6')">記録なしで、確定する</button>
 </div>
 </div>
 </section>
@@ -388,9 +388,7 @@ window.scrollTo(0, 0);
       String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
   };
   tick(); setInterval(tick, 1000);
-  const d5 = new Date(Date.now() + 60000);
-  document.getElementById('day5clock').textContent =
-    String(d5.getHours()).padStart(2, '0') + ':' + String(d5.getMinutes()).padStart(2, '0') + ':' + String(d5.getSeconds()).padStart(2, '0');
+  document.getElementById('day5clock').textContent = '';
   renderGrid('grid1');
 })();
 
@@ -432,6 +430,11 @@ function stockLine(day) {
 /* 進行 */
 function transit(nextId) {
   if (nextId === 'd7') prepareDay7();
+  if (nextId === 'd5') {
+    const d5 = new Date(Date.now() + 60000);
+    document.getElementById('day5clock').textContent =
+      String(d5.getHours()).padStart(2, '0') + ':' + String(d5.getMinutes()).padStart(2, '0') + ':' + String(d5.getSeconds()).padStart(2, '0');
+  }
   const target = document.getElementById(nextId);
   if (!target) return;
   const startY = window.scrollY;
@@ -551,13 +554,13 @@ function showEnding() {
   document.getElementById('endTitle').textContent = titles[n];
   document.getElementById('endText').innerText = texts[n];
   const mini = (label, gray) => '<span class="mini' + (gray ? ' gray' : '') + '">' + label + '</span>';
-  document.getElementById('rowD3').innerHTML = (state.noticed[3] ? '記録者が指摘' : '指摘なし') + mini(state.noticed[3] ? '指摘' : '見過ごし', !state.noticed[3]);
-  document.getElementById('rowD4').innerHTML = (state.noticed[4] ? '記録者が指摘' : '指摘なし') + mini(state.noticed[4] ? '指摘' : '見過ごし', !state.noticed[4]);
+  document.getElementById('rowD3').innerHTML = (state.noticed[3] ? '「違う気がする」と回答' : '「正しい」と回答') + mini(state.noticed[3] ? '指摘' : '見過ごし', !state.noticed[3]);
+  document.getElementById('rowD4').innerHTML = (state.noticed[4] ? '「違う気がする」と回答' : '「正しい」と回答') + mini(state.noticed[4] ? '指摘' : '見過ごし', !state.noticed[4]);
   document.getElementById('rowD5').innerHTML = 'この日の記録は、ありません' + mini('照合不能', true);
-  document.getElementById('rowD6').innerHTML = (state.discarded ? '記録者により破棄' : '記録者により保持') + mini(state.discarded ? '破棄' : '保持', !state.discarded);
+  document.getElementById('rowD6').innerHTML = '期限切れの🍅への、あなたの判断' + mini(state.discarded ? '破棄' : '保持', !state.discarded);
   document.getElementById('rowMemo').innerHTML =
-    (state.memo === 'orig' ? '記憶は、正しかった' : state.memo === 'alt' ? '書き換わった文が、選ばれました' : '未照合') +
-    mini(state.memo === 'orig' ? '一致' : '不一致', state.memo !== 'orig');
+    (state.memo === 'orig' ? 'Day 1 の文面を、正しく選べました' : state.memo === 'alt' ? '書き換わった文面を、選びました' : '覚えていないと、答えました') +
+    mini(state.memo === 'orig' ? '一致' : state.memo === 'alt' ? '不一致' : '未照合', state.memo !== 'orig');
   document.getElementById('resultTotal').textContent = '気づけたずれ：' + n + ' / 3 ― ' +
     (n === 3 ? '記録は、まだあなたのものでした' : n === 0 ? '記録は、もうあなたのものではありません' : '記録は、ずれていました');
   document.getElementById('resultStamp').textContent = n === 3 ? '記録保全' : n === 0 ? '記録喪失' : 'ずれあり';
