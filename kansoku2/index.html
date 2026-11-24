@@ -116,13 +116,13 @@
 
 <!-- 0. 研究所トップ -->
 <section id="s0">
-  <p class="ts"><span class="rec">● REC</span>　ARCHIVE No. K-07</p>
+  <p class="ts"><span class="rec">● REC</span>　ARCHIVE No. K-07　<span id="liveClock"></span></p>
   <h1>観測記録K</h1>
   <p>被験者Kの冷蔵庫 ― 定点観測記録</p>
   <p style="font-size:19px; letter-spacing:.14em;">誰もいないのに、増えている。</p>
   <div class="log">
     <p>観測機関：生活記録観測所</p>
-    <p>目的：一人暮らしの食料保管の実態を、記録すること。</p>
+    <p>目的：一人暮らしの食料保管の実態を記録すること。</p>
     <p>方法：冷蔵庫内を定点観測し、購入記録・廃棄記録・本人の証言と照合する。</p>
     <p>被験者K：大学2年、一人暮らし。本人の同意のもと、氏名は伏せて公開する。</p>
     <p>本所の記録に、誤りはありません。</p>
@@ -181,7 +181,6 @@
     <button data-food="🍌" aria-label="バナナ">🍌</button>
     <button data-food="🥦" aria-label="ブロッコリー">🥦</button>
     <button data-food="🥛" aria-label="牛乳">🥛</button>
-    <button data-food="🍞" aria-label="パン">🍞</button>
     <button data-food="🧀" aria-label="チーズ">🧀</button>
     <button data-food="🍅" aria-label="トマト">🍅</button>
   </div>
@@ -237,7 +236,7 @@
   <p class="ts">DAY 2 ― 19:42　買い物／21:05　観測</p>
   <div class="doc receipt-doc">
     <p class="dlabel">【資料1】購入記録</p>
-    <p>🍞 ×1<br>🧻 ×1<br>🍙 ×1<br>※いずれも、冷蔵庫の外で保管されるもの</p>
+    <p>🍞 ×1<br>🧻 ×1<br>🍙 ×1<br>※いずれも、冷蔵庫外で保管</p>
   </div>
   <div class="doc">
     <p class="dlabel">【資料2】本人の申告</p>
@@ -511,7 +510,7 @@
 <!-- リザルト -->
 <section id="s-result">
   <p>観測が完了しました。<br>ご協力ありがとうございました。</p>
-  <p class="small">結果画像は保存してシェアいただけます。</p>
+  <p class="small">結果画像は、保存してシェアできます。</p>
   <div class="paper" id="resultPaper">
     <p class="psub">生活記録観測所</p>
     <p class="ptitle">観測記録ファイル ― 表紙</p>
@@ -576,12 +575,21 @@ window.scrollTo(0, 0);
   if (h && h.plays > 0) {
     document.getElementById('revisitText').innerHTML = (h.missed && h.missed.length)
       ? '前回の観測の、続きです。<br>前回、あなたが見落としたのは：' + h.missed.join('、') + ' でした。<br>再観測として、同じ記録をもう一度開きます。'
-      : '前回の観測の、続きです。<br>前回、あなたは全部の齟齬に気づけました。……本当に、そうでしたか？';
+      : '前回の観測の、続きです。<br>前回、あなたは全部の異常に気づけました。……本当に、そうでしたか？';
     document.getElementById('revisit').classList.remove('hidden');
   }
   const d = new Date();
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
   document.getElementById('finalDate').textContent =
-    d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' ― 新規観測対象：あなたの冷蔵庫';
+    d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' ' + hh + ':' + mm + ' ― 新規観測対象：あなたの冷蔵庫';
+  const clock = document.getElementById('liveClock');
+  const tick = () => {
+    const t = new Date();
+    clock.textContent = t.getFullYear() + '.' + (t.getMonth() + 1) + '.' + t.getDate() + ' ' +
+      String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
+  };
+  tick(); setInterval(tick, 1000);
 })();
 
 /* 入力（寄せ） */
@@ -748,7 +756,7 @@ function showEnding() {
     title.textContent = '結末A「観測者」';
     log.innerHTML =
       '<p>照合表 ― 記録と、申告。</p>' +
-      '<p>🍇｜記録：Day 2のレシートに、購入行あり・特売｜申告：「買っていない」</p>' +
+      '<p>🍇｜記録：Day 2のレシートに、特売の購入行あり｜申告：「買っていない」</p>' +
       '<p>🥚｜記録：Day 4に、購入記録なし｜証言：「最初から、6個」</p>' +
       '<p>🥦｜記録：廃棄の実行記録、なし｜申告：「捨てた」</p>' +
       '<p>時刻 25:13｜深夜の開閉記録。本人の申告なし。寝ぼけて開けた、本人の記録でした</p>' +
@@ -757,7 +765,7 @@ function showEnding() {
   } else if (state.score >= 1) {
     title.textContent = '結末B「半分だけ見ていた」';
     const TBL = {
-      1: '<p>🍇｜記録：Day 2のレシートに、購入行あり・特売｜申告：「買っていない」</p>',
+      1: '<p>🍇｜記録：Day 2のレシートに、特売の購入行あり｜申告：「買っていない」</p>',
       2: '<p>🥚｜記録：Day 4に、購入記録なし｜証言：「最初から、6個」</p>',
       3: '<p>🥦｜記録：廃棄の実行記録、なし｜申告：「捨てた」</p>'
     };
