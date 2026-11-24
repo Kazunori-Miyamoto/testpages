@@ -135,6 +135,12 @@
   .record-foot { margin: 0; text-align: center; font-size: 12px; color: var(--pencil); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
   @media (max-width: 380px) { .record-body dl div { grid-template-columns: 1fr; gap: 0; } }
   .spacer { height: 12px; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .chip { font: inherit; font-size: 13px; color: var(--pencil); background: none; border: 0; padding: 6px 10px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .chip:hover:not(:disabled) { color: var(--ink); }
+  .chip:focus-visible { outline: 2px solid var(--ink); }
+  .chip:disabled { opacity: .4; cursor: default; }
+  .chip.picked { color: var(--ink); opacity: 1; text-decoration: none; font-weight: 700; }
   .single.col { flex-direction: column; align-items: center; gap: 10px; }
   .voices { width: 100%; display: flex; flex-direction: column; gap: 6px; }
   .voices-head { margin: 14px 0 2px; font-size: 12px; color: var(--pencil); letter-spacing: .08em; }
@@ -182,6 +188,10 @@
 
   const DEFAULT_HAPPY = "いいね！なれるよ";
   const DEFAULT_SAD = "先生って今、大変らしいよ〜";
+  // 「本気にされなかった」人の体験を、聞き流す返事として出す
+  const DISMISS = "はいはい、そうだね";
+  // 入力が「言われた言葉そのもの」ではなく、説明文に見えるとき
+  const looksLikeExplanation = (t) => t.length > 30 || /言われ|言葉|ありません|覚えて|記憶|特にない|^なし$|^ない$|[（(]/.test(t);
 
   // 各選択肢：見えた顔（その場の反応）と、本当の気持ち（見えない）
   // T1 は冒頭で書いた「うれしかった言葉」と「悲しかった言葉」
@@ -206,7 +216,7 @@
   // ---------- 状態 ----------
   let S;
   function fresh() {
-    return { dream: null, happy: "", sad: "", ownHappy: false, ownSad: false, picks: [], rows: [], orders: [], quick: null, quickFree: false, answer: null, I: rand(["ぼく", "わたし"]) };
+    return { dream: null, happy: "", sad: "", ownHappy: false, ownSad: false, happyState: "blank", sadState: "blank", picks: [], rows: [], orders: [], quick: null, quickFree: false, answer: null, I: rand(["ぼく", "わたし"]) };
   }
   function clean(s) { return String(s || "").trim().replace(/^[「『"“']+|[」』"”']+$/g, "").trim().slice(0, 60); }
   const q = (s) => `「${s}」`;
@@ -265,7 +275,7 @@
     });
   }
 
-  function ask(inner, placeholder, id) {
+  function ask(inner, placeholder, id, chips = []) {
     return new Promise((resolve) => {
       const form = el("form", "ask-form");
       const input = el("input", "free");
@@ -279,8 +289,23 @@
         input.disabled = true; btn.disabled = true; btn.classList.add("picked");
         input.blur();
         fastNext = true;
-        resolve(input.value);
+        chipBox.querySelectorAll("button").forEach((x) => (x.disabled = true));
+        resolve({ text: input.value });
       });
+      const chipBox = el("div", "chips");
+      chips.forEach((c) => {
+        const b = el("button", "chip", c.label);
+        b.type = "button";
+        b.addEventListener("click", () => {
+          input.disabled = true; btn.disabled = true;
+          chipBox.querySelectorAll("button").forEach((x) => (x.disabled = true));
+          b.classList.add("picked");
+          fastNext = true;
+          resolve({ chip: c.v });
+        });
+        chipBox.appendChild(b);
+      });
+      if (chips.length) form.appendChild(chipBox);
       inner.appendChild(form);
       setTimeout(() => { try { input.focus({ preventScroll: true }); } catch {} }, 300);
     });
@@ -321,25 +346,34 @@
 
     s = screen();
     s.append(el("p", "text", "子どものころ、<br>なりたかったものは何ですか？"));
-    S.dream = clean(await ask(s, "例：パイロット", "dream-input")) || null;
+    S.dream = clean((await ask(s, "例：パイロット", "dream-input")).text) || null;
 
     const said = S.dream ? `<span class="say">「${esc(S.dream)}になりたい！」</span><br>とオトナに話したとき、` : "その夢をオトナに話したとき、";
     s = screen();
     s.append(el("p", "text", `${said}<br>言われて<b>うれしかった</b>言葉は？`),
-      el("p", "note", "覚えている言葉を、そのまま書いてください"));
-    S.happy = clean(await ask(s, "例：きっとなれるよ", "happy-input"));
+      el("p", "note", "言われた言葉を、そのまま書いてください。<br>このあと、あなたの返事として使います"));
+    const h = await ask(s, "例：きっとなれるよ", "happy-input",
+      [{ label: "言われたことがない", v: "none" }, { label: "覚えていない", v: "forgot" }]);
+    const hw = await settle(h);
+    S.happyState = hw.state; S.happy = hw.text;
 
     s = screen();
     s.append(el("p", "text", `では、<br>言われて<b>悲しかった</b>言葉は？`),
       el("p", "note", "思い出したくない場合は、空欄で進めてください"));
-    S.sad = clean(await ask(s, "例：そんなの無理だよ", "sad-input"));
+    const d = await ask(s, "例：そんなの無理だよ", "sad-input",
+      [{ label: "言われたことがない", v: "none" }, { label: "本気にされなかった", v: "dismissed" }, { label: "覚えていない", v: "forgot" }]);
+    const dw = await settle(d);
+    S.sadState = dw.state; S.sad = dw.text;
 
-    S.ownHappy = !!S.happy; S.ownSad = !!S.sad;
-    S.happy = S.happy ? toTeacher(S.happy) : DEFAULT_HAPPY;
-    S.sad = S.sad ? toTeacher(S.sad) : DEFAULT_SAD;
+    S.ownHappy = S.happyState === "own"; S.ownSad = S.sadState === "own";
+    S.happy = S.ownHappy ? toTeacher(S.happy) : DEFAULT_HAPPY;
+    S.sad = S.ownSad ? toTeacher(S.sad) : S.sadState === "dismissed" ? DISMISS : DEFAULT_SAD;
 
     s = screen();
-    if (S.ownHappy || S.ownSad) s.append(el("p", "text", memLines()));
+    s.append(el("p", "text", memLines()));
+    if (S.happyState === "none" || S.sadState === "none" || S.sadState === "dismissed") {
+      s.append(el("p", "text", "言われなかったことも、<br>記憶に残ります。"));
+    }
     s.append(el("p", "text warn", "記録しました。"));
     await wait(1400);
     s.append(el("p", "text", "では、目の前の子に<br>声をかけてください。"));
@@ -348,11 +382,32 @@
     await conversation();
   }
 
+  // 入力を「言葉そのもの／言われたことがない／本気にされなかった／覚えていない／空欄」に整理する
+  async function settle(res) {
+    if (res.chip) return { state: res.chip, text: "" };
+    const t = clean(res.text);
+    if (!t) return { state: "blank", text: "" };
+    if (!looksLikeExplanation(t)) return { state: "own", text: t };
+    const s = screen();
+    s.append(el("p", "text", `<span class="say">${esc(q(t))}</span>`),
+      el("p", "text", "これは、言われた言葉<br>そのものですか？"),
+      el("p", "note", "このあと、子どもへの返事として使います"));
+    const c = await choose(s, [
+      { label: "はい、この言葉です", v: "own" },
+      { label: "言われたことがない", v: "none" },
+      { label: "本気にされなかった", v: "dismissed" }
+    ], "grid", false);
+    return { state: c.v, text: c.v === "own" ? t : "" };
+  }
+
+  const STATE_LABEL = { none: "（言われたことがない）", dismissed: "（本気にされなかった）", forgot: "（覚えていない）", blank: "（未記入）" };
+  const happyShown = () => (S.ownHappy ? q(S.happy) : STATE_LABEL[S.happyState] || STATE_LABEL.blank);
+  const sadShown = () => (S.ownSad ? q(S.sad) : STATE_LABEL[S.sadState] || STATE_LABEL.blank);
+  // 選んだ「否定側」の言葉が何だったか
+  const sadKind = () => (S.ownSad ? "あなたが悲しかった言葉" : S.sadState === "dismissed" ? "あなたが受けた態度" : "夢を閉ざす言葉");
+
   function memLines() {
-    const mem = [];
-    if (S.ownHappy) mem.push(`うれしかった言葉<br><span class="say">${esc(q(S.happy))}</span>`);
-    if (S.ownSad) mem.push(`悲しかった言葉<br><span class="say">${esc(q(S.sad))}</span>`);
-    return mem.join("<br><br>");
+    return `うれしかった言葉<br><span class="say">${esc(happyShown())}</span><br><br>悲しかった言葉<br><span class="say">${esc(sadShown())}</span>`;
   }
 
   async function turn(seenFace, say, choices, note) {
@@ -360,19 +415,22 @@
     s.append(el("div", "face", seenFace), el("p", "say", esc(kid(say))));
     const p = choose(s, choices);
     S.orders.push(s._order);
-    if (note) s.append(el("p", "note own", note));
+    if (note) s.append(el("p", "note own", note.split("<br>").map(esc).join("<br>")));
     return p;
   }
 
   async function conversation() {
     // T1：自分が言われた言葉で答える
-    const note = S.ownHappy && S.ownSad ? "どちらも、あなたが言われた言葉です"
-      : (S.ownHappy || S.ownSad) ? "片方は、あなたが言われた言葉です" : "";
+    const parts = [];
+    if (S.ownHappy && S.ownSad) parts.push("どちらも、あなたが言われた言葉です");
+    else if (S.ownHappy || S.ownSad) parts.push("片方は、あなたが言われた言葉です");
+    if (S.sadState === "dismissed") parts.push(`${q(DISMISS)}は、あなたが受けた態度です`);
+    const note = parts.join("<br>");
     const c1 = await turn("😀", "「ぼく、せんせいになりたい！」",
       [{ label: q(S.happy), v: "A" }, { label: q(S.sad), v: "B" }], note);
     const r1 = c1.v === "A"
       ? { text: q(S.happy), tag: "背中を押した", seen: rand(HAPPY), heart: rand(HAPPY), own: S.ownHappy ? "うれしかった言葉" : "" }
-      : { text: q(S.sad), tag: "ブレーキをかけた", seen: "🙂", heart: "😥", own: S.ownSad ? "悲しかった言葉" : "" };
+      : { text: q(S.sad), tag: "ブレーキをかけた", seen: "🙂", heart: "😥", own: S.ownSad ? "悲しかった言葉" : S.sadState === "dismissed" ? "受けた態度" : "" };
     S.picks.push(c1.v); S.rows.push(r1);
 
     // T2：やさしい嘘か、正直か
@@ -422,7 +480,7 @@
       pass:  { line: "あなたの一言が、<br>先生をつくる。", cta: "mext" },
       sweet: { line: "その場の笑顔と、<br>10年後の笑顔は、<br>ちがう。", cta: "mext" },
       undo:  { line: "最初の一言は、<br>取り消せない。", cta: "nagoya" },
-      chain: { line: S.ownSad ? "その言葉、<br>あなたも<br>言われましたね。" : "言葉は、<br>こうして受け継がれる。", cta: "nagoya" }
+      chain: { line: S.ownSad ? "その言葉、<br>あなたも<br>言われましたね。" : S.sadState === "dismissed" ? "聞き流されたことを、<br>あなたは<br>覚えていますね。" : "言葉は、<br>こうして受け継がれる。", cta: "nagoya" }
     }[key];
     s = screen();
     s.append(el("p", "text", "言った言葉は、忘れる。<br>言われた言葉は、忘れない。"));
@@ -434,7 +492,7 @@
       s.append(el("p", "note", "ただし、現実の会話に<br>やり直しはありません。"));
     }
     const plays = (prev?.plays || 0) + 1;
-    save({ plays, first: r1.text, key, words: { dream: S.dream, happy: S.happy, sad: S.sad, ownHappy: S.ownHappy, ownSad: S.ownSad } });
+    save({ plays, first: r1.text, key, words: { dream: S.dream, happy: S.happy, sad: S.sad, ownHappy: S.ownHappy, ownSad: S.ownSad, happyState: S.happyState, sadState: S.sadState } });
     await wait(900);
 
     if (p1 === "A") {
@@ -496,7 +554,7 @@
     await wait(1400);
     const head = {
       A: S.quickFree ? "もう一度でも、<br>言えました。" : "3秒でも、<br>言えました。",
-      B: S.quickFree ? "もう一度選んだのは、<br>あなたが悲しかった<br>言葉でした。" : "とっさに出たのは、<br>あなたが悲しかった<br>言葉でした。",
+      B: `${S.quickFree ? "もう一度選んだのは、" : "とっさに出たのは、"}<br>${sadKind()}<br>でした。`,
       T: "何も、<br>言えませんでした。"
     }[r.v];
     s.append(el("p", "text big", head));
@@ -529,11 +587,12 @@
     s.append(el("p", "text", "子どもの夢に向けられがちな言葉"));
     const box = el("div", "voices");
     const sad = [...EXAMPLES.sad];
-    if (S.ownSad) sad.unshift(S.sad);
+    const mineSad = S.ownSad || S.sadState === "dismissed";
+    if (mineSad) sad.unshift(S.sad);
     const happy = [...EXAMPLES.happy];
     if (S.ownHappy) happy.unshift(S.happy);
     box.append(el("p", "voices-head", "悲しかった言葉"));
-    sad.forEach((w, i) => box.append(el("p", "voice" + (i === 0 && S.ownSad ? " mine" : ""), esc(q(w)) + (i === 0 && S.ownSad ? "<small>あなた</small>" : ""))));
+    sad.forEach((w, i) => box.append(el("p", "voice" + (i === 0 && mineSad ? " mine" : ""), esc(q(w)) + (i === 0 && mineSad ? `<small>${S.ownSad ? "あなた" : "あなたが受けた態度"}</small>` : ""))));
     box.append(el("p", "voices-head", "うれしかった言葉"));
     happy.forEach((w, i) => box.append(el("p", "voice" + (i === 0 && S.ownHappy ? " mine" : ""), esc(q(w)) + (i === 0 && S.ownHappy ? "<small>あなた</small>" : ""))));
     s.append(box, el("p", "note", "あなた以外の言葉は、制作側が用意した例です"),
@@ -566,8 +625,8 @@
         <h2>声かけの記録</h2>
         <dl class="record-me">
           <div><dt>子どもの頃の夢</dt><dd class="w">${esc(S.dream || "（未記入）")}</dd></div>
-          <div><dt>うれしかった言葉</dt><dd class="w">${S.ownHappy ? esc(q(S.happy)) : "（未記入）"}</dd></div>
-          <div><dt>悲しかった言葉</dt><dd class="w">${S.ownSad ? esc(q(S.sad)) : "（未記入）"}</dd></div>
+          <div><dt>うれしかった言葉</dt><dd class="w">${esc(happyShown())}</dd></div>
+          <div><dt>悲しかった言葉</dt><dd class="w">${esc(sadShown())}</dd></div>
         </dl>
         <ul class="record-turns">
           <li class="head"><span></span><span></span><span class="f">見えた顔</span><span class="f">心の中</span></li>
